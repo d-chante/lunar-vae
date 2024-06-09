@@ -1,0 +1,11 @@
+directories:
+  profiles_directory: "/esthar/diviner_data/data/profiles"
+  output_directory: "/esthar/diviner_data/data/output"
+
+training_parameters:
+  latent_variables: 4
+  learning_rate: 1e-3
+  epochs: 10
+  batch_size: 200
+  n_splits: 5
+  gpu: 0
