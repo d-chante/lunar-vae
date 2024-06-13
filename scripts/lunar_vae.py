@@ -109,15 +109,15 @@ class VAE(nn.Module):
             out_channels=latent_variables,
             kernel_size=1,
             stride=1,
-            padding=0)  
-           
+            padding=0)
+
         # 11e
         self.fc_logvar = nn.Conv1d(
             in_channels=32,
             out_channels=latent_variables,
             kernel_size=1,
             stride=1,
-            padding=0) 
+            padding=0)
 
         self.decoder = nn.Sequential(
             # 1d
@@ -212,6 +212,7 @@ class VAE(nn.Module):
 
     @staticmethod
     def loss_function(recon_x, x, mu, logvar, beta):
-        reconstruction_loss = nn.functional.mse_loss(recon_x, x, reduction='sum')
+        reconstruction_loss = nn.functional.mse_loss(
+            recon_x, x, reduction='sum')
         kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return reconstruction_loss + beta * kl_divergence

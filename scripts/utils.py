@@ -48,7 +48,7 @@ class Utils(object):
 
         remainder_data, test_data = train_test_split(
             data, test_size=0.1, random_state=42)
-        
+
         train_data, validation_data = train_test_split(
             remainder_data, test_size=0.2, random_state=42)
 
@@ -56,7 +56,8 @@ class Utils(object):
         train_loader = DataLoader(train_tensor, batch_size, shuffle=True)
 
         validation_tensor = torch.tensor(validation_data, dtype=torch.float32)
-        validation_loader = DataLoader(validation_tensor, batch_size, shuffle=True)
+        validation_loader = DataLoader(
+            validation_tensor, batch_size, shuffle=True)
 
         test_tensor = torch.tensor(test_data, dtype=torch.float32)
         test_loader = DataLoader(test_tensor, batch_size, shuffle=True)

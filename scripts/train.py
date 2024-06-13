@@ -12,9 +12,9 @@ from utils import Utils
 
 ut = Utils()
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # PARAMETERS
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 cfg_filepath = "/lunar-vae/config/cosmocanyon_cfg.yaml"
 dirs, config = ut.GetConfig(cfg_filepath)
 
@@ -30,9 +30,9 @@ n_splits = config['n_splits']
 gpu = config['gpu']
 input_dims = (1, 120)
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # LOGGER
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
@@ -41,32 +41,32 @@ stream_handler.setFormatter(logging.Formatter(
     '%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(stream_handler)
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # DEVICE
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 device = torch.device(f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
 logging.info(f"Training with: {device}")
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # MODEL
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 model = VAE(latent_variables).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 summary(model, input_dims, batch_size)
 time.sleep(1)  # Wait a moment to print summary
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # DATA
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 train_data, validation_data, test_data = ut.LoadData(profiles_dir, batch_size)
 
 logging.info(f"Training data: {len(train_data.dataset)}")
 logging.info(f"Validation data: {len(validation_data.dataset)}")
 logging.info(f"Test data: {len(test_data.dataset)}")
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # TRAIN/VALIDATE
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 training_loss = []
 validation_loss = []
 
@@ -110,9 +110,9 @@ plt.ylabel('Loss')
 plt.legend()
 plt.show()
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # TEST
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 logging.info("Testing")
 test_loss = 0
 
@@ -132,12 +132,12 @@ with torch.no_grad():
 avg_test_loss = test_loss / len(test_data.dataset)
 print(f"Average Test Loss: {avg_test_loss}\n")
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # LATENT VARIABLES
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 # SAVE
-# * * * * * * * * * * * * * * * * 
+# * * * * * * * * * * * * * * * *
 
 # TODO
