@@ -5,7 +5,8 @@ directories:
 training_parameters:
   latent_variables: 4
   learning_rate: 1e-3
-  epochs: 10
+  beta: 0.2
+  epochs: 20
   batch_size: 200
   n_splits: 5
   gpu: 0

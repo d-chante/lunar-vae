@@ -5,6 +5,7 @@ import numpy as np
 import os
 from sklearn.model_selection import train_test_split
 import torch
+from torch.utils.data import DataLoader
 import yaml
 
 
@@ -23,7 +24,7 @@ class Utils(object):
         temp_values = [val[1] for val in data['data']]
         return np.array(temp_values)
 
-    def LoadData(self, data_dir):
+    def LoadData(self, data_dir, batch_size):
         '''
         TBD
         '''
@@ -45,13 +46,22 @@ class Utils(object):
 
         data = np.expand_dims(data, axis=1)
 
-        train_data, test_data = train_test_split(
-            data, test_size=0.2, random_state=42)
+        remainder_data, test_data = train_test_split(
+            data, test_size=0.1, random_state=42)
+        
+        train_data, validation_data = train_test_split(
+            remainder_data, test_size=0.2, random_state=42)
 
         train_tensor = torch.tensor(train_data, dtype=torch.float32)
-        test_tensor = torch.tensor(test_data, dtype=torch.float32)
+        train_loader = DataLoader(train_tensor, batch_size, shuffle=True)
 
-        return train_tensor, test_tensor
+        validation_tensor = torch.tensor(validation_data, dtype=torch.float32)
+        validation_loader = DataLoader(validation_tensor, batch_size, shuffle=True)
+
+        test_tensor = torch.tensor(test_data, dtype=torch.float32)
+        test_loader = DataLoader(test_tensor, batch_size, shuffle=True)
+
+        return train_loader, validation_loader, test_loader
 
     @staticmethod
     def GetConfig(config_filepath):

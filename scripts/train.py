@@ -3,10 +3,8 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from sklearn.model_selection import KFold
 import time
 import torch
-from torch.utils.data import DataLoader, Subset
 from torchsummary import summary
 
 from lunar_vae import VAE
@@ -14,7 +12,9 @@ from utils import Utils
 
 ut = Utils()
 
-# Set up configuration parameters
+# * * * * * * * * * * * * * * * * 
+# PARAMETERS
+# * * * * * * * * * * * * * * * * 
 cfg_filepath = "/lunar-vae/config/cosmocanyon_cfg.yaml"
 dirs, config = ut.GetConfig(cfg_filepath)
 
@@ -23,13 +23,16 @@ output_dir = dirs['output_directory']
 
 latent_variables = config['latent_variables']
 learning_rate = float(config['learning_rate'])
-epochs = config['epochs']
+beta = config['beta']
+num_epochs = config['epochs']
 batch_size = config['batch_size']
 n_splits = config['n_splits']
 gpu = config['gpu']
 input_dims = (1, 120)
 
-# Configure logger
+# * * * * * * * * * * * * * * * * 
+# LOGGER
+# * * * * * * * * * * * * * * * * 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
@@ -38,109 +41,103 @@ stream_handler.setFormatter(logging.Formatter(
     '%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(stream_handler)
 
-# Set up model and devices
+# * * * * * * * * * * * * * * * * 
+# DEVICE
+# * * * * * * * * * * * * * * * * 
 device = torch.device(f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
 logging.info(f"Training with: {device}")
 
-vae = VAE(latent_variables).to(device)
-optimizer = torch.optim.Adam(vae.parameters(), lr=learning_rate)
-summary(vae, input_dims)
+# * * * * * * * * * * * * * * * * 
+# MODEL
+# * * * * * * * * * * * * * * * * 
+model = VAE(latent_variables).to(device)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+summary(model, input_dims, batch_size)
 time.sleep(1)  # Wait a moment to print summary
 
-data, data_test = ut.LoadData(profiles_dir)
+# * * * * * * * * * * * * * * * * 
+# DATA
+# * * * * * * * * * * * * * * * * 
+train_data, validation_data, test_data = ut.LoadData(profiles_dir, batch_size)
 
-kfold = KFold(n_splits, shuffle=True)
+logging.info(f"Training data: {len(train_data.dataset)}")
+logging.info(f"Validation data: {len(validation_data.dataset)}")
+logging.info(f"Test data: {len(test_data.dataset)}")
 
-all_train_losses = []
-all_val_losses = []
+# * * * * * * * * * * * * * * * * 
+# TRAIN/VALIDATE
+# * * * * * * * * * * * * * * * * 
+training_loss = []
+validation_loss = []
 
-start_t = datetime.datetime.now()
+for epoch in range(num_epochs):
+    logging.info(f"Epoch {epoch} of {num_epochs}")
 
-for fold, (train_idx, val_idx) in enumerate(kfold.split(data)):
-    logging.info(f"Fold {fold+1}/{n_splits}")
-    fold_start_t = datetime.datetime.now()
+    model.train()
+    total_training_loss = 0
+    for batch in train_data:
+        batch = batch.to(device)
+        optimizer.zero_grad()
+        reconstructed, mu, logvar = model(batch)
+        loss = VAE.loss_function(reconstructed, batch, mu, logvar, beta)
+        loss.backward()
+        optimizer.step()
+        total_training_loss += loss.item()
 
-    train_losses = []
-    val_losses = []
+    avg_training_loss = total_training_loss / len(train_data.dataset)
+    training_loss.append(avg_training_loss)
+    logging.info(f"Training Loss: {avg_training_loss}")
 
-    train_subset = Subset(data, train_idx)
-    val_subset = Subset(data, val_idx)
-
-    train_loader = DataLoader(
-        train_subset,
-        batch_size=batch_size,
-        shuffle=True)
-    val_loader = DataLoader(val_subset, batch_size=batch_size, shuffle=False)
-
-    vae.train()
-
-    for epoch in range(epochs):
-        train_loss = 0
-        for batch in train_loader:
-            optimizer.zero_grad()
-            batch = batch.to(device)
-            recon_batch, mu, logvar = vae(batch)
-            loss = VAE.loss_function(recon_batch, batch, mu, logvar, beta=0.2)
-            loss.backward()
-            optimizer.step()
-            train_loss += loss.item()
-        avg_train_loss = train_loss / len(train_loader.dataset)
-        train_losses.append(avg_train_loss)
-        logging.info(f"Epoch {epoch+1}/{epochs}, Train Loss: {avg_train_loss}")
-
-    vae.eval()
-
-    val_loss = 0
+    model.eval()
+    total_validation_loss = 0
     with torch.no_grad():
-        for batch in val_loader:
+        for batch in validation_data:
             batch = batch.to(device)
-            recon_batch, mu, logvar = vae(batch)
-            loss = VAE.loss_function(recon_batch, batch, mu, logvar, beta=0.2)
-            val_loss += loss.item()
-        avg_val_loss = val_loss / len(val_loader.dataset)
-        val_losses.append(avg_val_loss)
-        logging.info(f"Validation Loss for Fold {fold+1}: {avg_val_loss}")
+            reconstructed, mu, logvar = model(batch)
+            loss = VAE.loss_function(reconstructed, batch, mu, logvar, beta)
+            total_validation_loss += loss.item()
 
-    all_train_losses.append(train_losses)
-    all_val_losses.append(val_losses)
+    avg_validation_loss = total_validation_loss / len(validation_data.dataset)
+    validation_loss.append(avg_validation_loss)
+    logging.info(f"Validation Loss: {avg_validation_loss}\n")
 
-    logging.info(f"Fold training time: {ut.ElapsedTimeSince(fold_start_t)}\n")
-
-# Output results
-logging.info(f"Training time: {ut.ElapsedTimeSince(start_t)}\n")
-
-avg_train_losses = np.mean(all_train_losses, axis=0)
-avg_val_losses = np.mean(all_val_losses, axis=0)
-
-plt.figure(figsize=(8, 4))
-plt.plot(avg_train_losses, label='Average Training Loss')
-plt.plot(avg_val_losses, 'ro-', label='Average Validation Loss')
-plt.title('Training vs Validation Loss per Epoch')
-plt.xlabel('Epoch')
+plt.figure(figsize=(10, 5))
+plt.plot(training_loss, label='Training Loss')
+plt.plot(validation_loss, label='Validation Loss')
+plt.title('Training/Validation Loss per Epoch')
+plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
 plt.show()
 
-# Save results to file
-output_filename = os.path.join(output_dir, ut.GenerateFilename())
+# * * * * * * * * * * * * * * * * 
+# TEST
+# * * * * * * * * * * * * * * * * 
+logging.info("Testing")
+test_loss = 0
 
-# Flatten the nested lists
-flat_train_losses = [loss for sublist in all_train_losses for loss in sublist]
-flat_val_losses = [loss for sublist in all_val_losses for loss in sublist]
+latent_variables_mu = []
+latent_variables_logvar = []
 
-# Ensure the lists are of equal length
-assert len(flat_train_losses) == len(flat_val_losses), "Mismatch in lengths of training and validation losses"
+model.eval()
+with torch.no_grad():
+    for batch in test_data:
+        batch = batch.to(device)
+        reconstructed, mu, logvar = model(batch)
+        latent_variables_mu.append(mu.cpu().numpy())
+        latent_variables_logvar.append(logvar.cpu().numpy())
+        loss = VAE.loss_function(reconstructed, batch, mu, logvar, beta)
+        test_loss = loss.item()
 
-# Write to CSV
-with open(output_filename + ".csv", 'w') as file:
-    file.write('Training Loss,Validation Loss\n')
-    for train_loss, val_loss in zip(flat_train_losses, flat_val_losses):
-        file.write(f"{train_loss},{val_loss}\n")
-logging.info(f"Results saved to: {output_filename}.csv")
+avg_test_loss = test_loss / len(test_data.dataset)
+print(f"Average Test Loss: {avg_test_loss}\n")
 
-plt.savefig(output_filename + ".png", format='png', dpi=300)
-logging.info(f"Plot saved to: {output_filename}.png")
+# * * * * * * * * * * * * * * * * 
+# LATENT VARIABLES
+# * * * * * * * * * * * * * * * * 
 
-model_state = vae.state_dict()
-torch.save(model_state, output_filename + ".pth")
-logging.info(f"Model saved to: {output_filename}.pth")
+# * * * * * * * * * * * * * * * * 
+# SAVE
+# * * * * * * * * * * * * * * * * 
+
+# TODO
