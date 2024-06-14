@@ -51,8 +51,9 @@ def main():
     # * * * * * * * * * * * * * * * *
     # DEVICE
     # * * * * * * * * * * * * * * * *
-    device = torch.device(
-        f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
+    #device = torch.device(
+    #    f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
+    device = torch.device('cpu')
     logging.info(f"Training with: {device}")
 
     # * * * * * * * * * * * * * * * *
@@ -60,12 +61,13 @@ def main():
     # * * * * * * * * * * * * * * * *
     model = VAE(latent_variables).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    summary(model, input_dims, batch_size)
-    time.sleep(1)  # Wait a moment to print summary
+    #summary(model, input_dims, batch_size)
+    #time.sleep(1)  # Wait a moment to print summary
 
     # * * * * * * * * * * * * * * * *
     # DATA
     # * * * * * * * * * * * * * * * *
+    logging.info(f"Loading data...")
     data, metrics = ut.LoadData(profiles_dir, batch_size)
 
     train_data = data[0]
