@@ -7,8 +7,9 @@
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1 
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=50G
+#SBATCH --gpus=1
 
 # Load anaconda module
 module load anaconda3/2023.03/default
