@@ -51,9 +51,8 @@ def main():
     # * * * * * * * * * * * * * * * *
     # DEVICE
     # * * * * * * * * * * * * * * * *
-    #device = torch.device(
-    #    f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
-    device = torch.device('cpu')
+    device = torch.device(
+        f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
     logging.info(f"Training with: {device}")
 
     # * * * * * * * * * * * * * * * *
