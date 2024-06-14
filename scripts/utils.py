@@ -3,6 +3,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pandas as pd
 from sklearn.model_selection import train_test_split
 import torch
 from torch.utils.data import DataLoader
@@ -62,7 +63,7 @@ class Utils(object):
         test_tensor = torch.tensor(test_data, dtype=torch.float32)
         test_loader = DataLoader(test_tensor, batch_size, shuffle=True)
 
-        return train_loader, validation_loader, test_loader
+        return [train_loader, validation_loader, test_loader], [mean, std]
 
     @staticmethod
     def GetConfig(config_filepath):
@@ -112,18 +113,56 @@ class Utils(object):
         plt.show()
 
     @staticmethod
-    def ElapsedTimeSince(timestamp):
+    def ElapsedSecondsSince(timestamp):
         '''
         TBD
         '''
         delta_t = datetime.datetime.now() - timestamp
-
         total_seconds = int(delta_t.total_seconds())
+
+        return total_seconds
+
+    @staticmethod
+    def FormatSeconds(total_seconds):
+        '''
+        TBD
+        '''
+        total_seconds = int(total_seconds)
 
         days, remainder = divmod(total_seconds, 86400)
         hours, remainder = divmod(remainder, 3600)
         minutes, seconds = divmod(remainder, 60)
 
-        formatted_time_delta = f"{days:02}:{hours:02}:{minutes:02}:{seconds:02}"
+        return f"{days} days, {hours} hours, {minutes} minutes, {seconds} seconds"
 
-        return formatted_time_delta
+    @staticmethod
+    def SaveLoss2Csv(training_loss, validation_loss, filepath):
+        df = pd.DataFrame({'training_loss': training_loss,
+                          'validation_loss': validation_loss})
+        df.to_csv(filepath, index=False)
+
+    @staticmethod
+    def SaveLatentVariables2Csv(array, filepath):
+        '''
+        TBD
+        '''
+        reshaped_array = array[0].reshape(-1, 4)
+        df = pd.DataFrame(
+            reshaped_array,
+            columns=[
+                'latent_variable_1',
+                'latent_variable_2',
+                'latent_variable_3',
+                'latent_variable_4'])
+        df.to_csv(filepath, index=False)
+
+    @staticmethod
+    def SaveOverallMetrics(
+            average_epoch_time,
+            total_training_time,
+            test_loss,
+            filepath):
+        with open(filepath, 'w') as file:
+            file.write(f"Average Epoch Time: {average_epoch_time}\n")
+            file.write(f"Total Training Time: {total_training_time}\n")
+            file.write(f"Test Loss: {test_loss}\n")

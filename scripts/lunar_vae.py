@@ -21,8 +21,6 @@ class VAE(nn.Module):
     def __init__(self, latent_variables):
         super(VAE, self).__init__()
 
-        self.input = nn.Sequential()
-
         self.encoder = nn.Sequential(
             # 1e
             Wrap1d(padding=1),
