@@ -49,16 +49,17 @@ def main():
     logger.addHandler(stream_handler)
 
     # * * * * * * * * * * * * * * * *
-    # DEVICE
+    # CUDA
     # * * * * * * * * * * * * * * * *
-    device = torch.device(
-        f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
-    logging.info(f"Training with: {device}")
+    if torch.cuda.is_available():
+        logging.info(f"CUDA available - default device: {torch.cuda.current_device()}\n")
+    else:
+        logging.info(f"CUDA not available - training on CPU\n")
 
     # * * * * * * * * * * * * * * * *
     # MODEL
     # * * * * * * * * * * * * * * * *
-    model = VAE(latent_variables).to(device)
+    model = VAE(latent_variables)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     summary(model, input_dims, batch_size)
     time.sleep(1)  # Wait a moment to print summary
@@ -101,7 +102,6 @@ def main():
         model.train()
         total_training_loss = 0
         for batch in train_data:
-            batch = batch.to(device)
             optimizer.zero_grad()
             reconstructed, mu, logvar = model(batch)
             loss = VAE.loss_function(reconstructed, batch, mu, logvar, beta)
@@ -117,7 +117,6 @@ def main():
         total_validation_loss = 0
         with torch.no_grad():
             for batch in validation_data:
-                batch = batch.to(device)
                 reconstructed, mu, logvar = model(batch)
                 loss = VAE.loss_function(
                     reconstructed, batch, mu, logvar, beta)
@@ -179,7 +178,6 @@ def main():
     model.eval()
     with torch.no_grad():
         for batch in test_data:
-            batch = batch.to(device)
             reconstructed, mu, logvar = model(batch)
             latent_variables_mu.append(mu.cpu().numpy())
             latent_variables_logvar.append(logvar.cpu().numpy())
@@ -190,7 +188,9 @@ def main():
     logging.info(f"Test Loss: {avg_test_loss}\n")
 
     m_path = os.path.join(output_dir, label + "_overall_metrics.txt")
-    ut.SaveOverallMetrics(
+    ut.SaveOtherMetrics(
+        metrics[0],
+        metrics[1],
         avg_epoch_time,
         total_training_time,
         avg_test_loss,

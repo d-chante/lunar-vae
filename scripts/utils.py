@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -20,10 +21,16 @@ class Utils(object):
         '''
         TBD
         '''
-        with open(json_file, 'r') as file:
-            data = json.load(file)
-        temp_values = [val[1] for val in data['data']]
-        return np.array(temp_values)
+        try:
+            with open(json_file, 'r') as file:
+                data = json.load(file)
+            temp_values = [val[1] for val in data['data']]
+            return np.array(temp_values)
+        
+        except Exception as e:
+            logging.error(f"Error trying to open JSON file {json_file} : ({e})")
+            return None
+
 
     def LoadData(self, data_dir, batch_size):
         '''
@@ -33,7 +40,9 @@ class Utils(object):
         profiles = []
 
         for profile in profile_list:
-            profiles.append(self.Json2Profile(os.path.join(data_dir, profile)))
+            p = self.Json2Profile(os.path.join(data_dir, profile))
+            if p is not None:
+                profiles.append(p)
 
         data = np.stack(profiles, axis=0)
 
@@ -157,12 +166,16 @@ class Utils(object):
         df.to_csv(filepath, index=False)
 
     @staticmethod
-    def SaveOverallMetrics(
+    def SaveOtherMetrics(
+            data_mean,
+            data_std,
             average_epoch_time,
             total_training_time,
             test_loss,
             filepath):
         with open(filepath, 'w') as file:
+            file.write(f"Data Mean: {data_mean}\n")
+            file.write(f"Data STD: {data_std}\n")
             file.write(f"Average Epoch Time: {average_epoch_time}\n")
             file.write(f"Total Training Time: {total_training_time}\n")
             file.write(f"Test Loss: {test_loss}\n")

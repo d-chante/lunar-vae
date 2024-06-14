@@ -20,8 +20,8 @@ env
 # Activate conda env
 conda activate /speed-scratch/d_chante/env/lvae
 
-# Run preprocessing job
-python3 /speed-scratch/d_chante/lunar-vae/scripts/train_and_test.py \
+# Run job
+srun python /speed-scratch/d_chante/lunar-vae/scripts/train_and_test.py \
     /speed-scratch/d_chante/lunar-vae/config/speed_cfg.yaml 
 
 # Deactivate the environment
