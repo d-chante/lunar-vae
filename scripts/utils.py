@@ -26,11 +26,11 @@ class Utils(object):
                 data = json.load(file)
             temp_values = [val[1] for val in data['data']]
             return np.array(temp_values)
-        
-        except Exception as e:
-            logging.error(f"Error trying to open JSON file {json_file} : ({e})")
-            return None
 
+        except Exception as e:
+            logging.error(
+                f"Error trying to open JSON file {json_file} : ({e})")
+            return None
 
     def LoadData(self, data_dir, batch_size):
         '''
@@ -175,7 +175,8 @@ class Utils(object):
             test_loss,
             filepath):
         with open(filepath, 'w') as file:
-            file.write(f"Data split [train/val/test]: {data_split[0]}/{data_split[1]}/{data_split[2]}\n")
+            file.write(
+                f"Data split [train/val/test]: {data_split[0]}/{data_split[1]}/{data_split[2]}\n")
             file.write(f"Data Mean: {data_mean}\n")
             file.write(f"Data STD: {data_std}\n")
             file.write(f"Average Epoch Time: {average_epoch_time}\n")

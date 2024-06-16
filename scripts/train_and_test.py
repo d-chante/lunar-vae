@@ -21,7 +21,7 @@ def main():
     # * * * * * * * * * * * * * * * *
     parser = argparse.ArgumentParser(
         description="""
-        Train, validate, and test Lunar VAE. 
+        Train, validate, and test Lunar VAE.
 
         Example usage:
             python3 train_and_test.py -c /home/user/lunar-vae/cfg.yml -s
@@ -29,8 +29,17 @@ def main():
         formatter_class=argparse.RawTextHelpFormatter
     )
 
-    parser.add_argument('-c', '--config', type=str, help="Path to configuration file", required=True)
-    parser.add_argument('-s', '--summary', action='store_true', help='Print model summary')
+    parser.add_argument(
+        '-c',
+        '--config',
+        type=str,
+        help="Path to configuration file",
+        required=True)
+    parser.add_argument(
+        '-s',
+        '--summary',
+        action='store_true',
+        help='Print model summary')
 
     args = parser.parse_args()
 
@@ -38,7 +47,7 @@ def main():
     # PARAMETERS
     # * * * * * * * * * * * * * * * *
     ut = Utils()
-    
+
     dirs, config = ut.GetConfig(args.config)
 
     profiles_dir = dirs['profiles_directory']
@@ -75,7 +84,7 @@ def main():
     # * * * * * * * * * * * * * * * *
     model = VAE(latent_variables).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    
+
     if args.summary:
         summary(model, input_dims, batch_size)
         time.sleep(1)  # Wait a moment to print summary
