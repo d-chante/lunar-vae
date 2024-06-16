@@ -145,6 +145,13 @@ class Utils(object):
         return f"{days} days, {hours} hours, {minutes} minutes, {seconds} seconds"
 
     @staticmethod
+    def CreateDirectory(dirpath):
+        '''
+        TBD
+        '''
+        os.makedirs(dirpath, exist_ok=True)
+
+    @staticmethod
     def SaveLoss2Csv(training_loss, validation_loss, filepath):
         df = pd.DataFrame({'training_loss': training_loss,
                           'validation_loss': validation_loss})
@@ -170,6 +177,7 @@ class Utils(object):
             data_split,
             data_mean,
             data_std,
+            final_learning_rate,
             average_epoch_time,
             total_training_time,
             test_loss,
@@ -177,8 +185,9 @@ class Utils(object):
         with open(filepath, 'w') as file:
             file.write(
                 f"Data split [train/val/test]: {data_split[0]}/{data_split[1]}/{data_split[2]}\n")
-            file.write(f"Data Mean: {data_mean}\n")
-            file.write(f"Data STD: {data_std}\n")
-            file.write(f"Average Epoch Time: {average_epoch_time}\n")
-            file.write(f"Total Training Time: {total_training_time}\n")
-            file.write(f"Test Loss: {test_loss}\n")
+            file.write(f"Data mean: {data_mean}\n")
+            file.write(f"Data standard deviation: {data_std}\n")
+            file.write(f"Final learning rate: {final_learning_rate}\n")
+            file.write(f"Average epoch time: {average_epoch_time}\n")
+            file.write(f"Total training time: {total_training_time}\n")
+            file.write(f"Test loss: {test_loss}\n")

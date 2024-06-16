@@ -213,3 +213,26 @@ class VAE(nn.Module):
             recon_x, x, reduction='sum')
         kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return reconstruction_loss + beta * kl_divergence
+
+    @staticmethod
+    def save_state(
+            epoch,
+            model,
+            optimizer,
+            scheduler,
+            training_loss,
+            validation_loss,
+            filepath):
+        '''
+        TBD
+        '''
+        checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'scheduler_state_dict': scheduler.state_dict(),
+            'training_loss': training_loss,
+            'validation_loss': validation_loss
+        }
+        torch.save(checkpoint, filepath)
+        return f"Saved state to {filepath}"

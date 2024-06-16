@@ -55,6 +55,8 @@ def main():
 
     latent_variables = config['latent_variables']
     learning_rate = float(config['learning_rate'])
+    patience = config['patience']
+    factor = config['factor']
     beta = config['beta']
     num_epochs = config['epochs']
     batch_size = config['batch_size']
@@ -84,6 +86,12 @@ def main():
     # * * * * * * * * * * * * * * * *
     model = VAE(latent_variables).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    scheduler = ReduceLROnPlateau(
+        optimizer,
+        mode='min',
+        factor=factor,
+        patience=patience,
+        verbose=True)
 
     if args.summary:
         summary(model, input_dims, batch_size)
@@ -113,7 +121,6 @@ def main():
     # * * * * * * * * * * * * * * * *
     training_loss = []
     validation_loss = []
-
     epoch_time = []
 
     training_start_time = datetime.datetime.now()
@@ -158,16 +165,31 @@ def main():
         elapsed_time = ut.ElapsedSecondsSince(epoch_start_time)
         epoch_time.append(elapsed_time)
 
-        logging.info(f"Elapsed time: {ut.FormatSeconds(elapsed_time)}")
+        logging.info(f"Elapsed time: {ut.FormatSeconds(elapsed_time)}\n")
 
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'loss': avg_training_loss,
-        }, ms_path)
+        logging.info(
+            model.save_state(
+                epoch,
+                model,
+                optimizer,
+                scheduler,
+                avg_training_loss,
+                avg_validation_loss,
+                ms_path))
 
-        logging.info(f"Saved model state to {ms_path}\n")
+        scheduler.step(avg_validation_loss)
+
+        logging.info(f"Learning rate: {optimizer.param_groups[0]['lr']}")
+
+    logging.info(
+        model.save_state(
+            epoch,
+            model,
+            optimizer,
+            scheduler,
+            avg_training_loss,
+            avg_validation_loss,
+            ms_path))
 
     avg_epoch_time = ut.FormatSeconds(sum(epoch_time) / num_epochs)
     total_training_time = ut.FormatSeconds(
@@ -221,6 +243,7 @@ def main():
         [len(train_data.dataset), len(validation_data.dataset), len(test_data.dataset)],
         metrics[0],
         metrics[1],
+        optimizer.param_groups[0]['lr'],
         avg_epoch_time,
         total_training_time,
         avg_test_loss,

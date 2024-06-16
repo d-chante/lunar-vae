@@ -5,6 +5,8 @@ directories:
 training_parameters:
   latent_variables: 4
   learning_rate: 1e-3
+  patience: 10
+  factor: 0.1
   beta: 0.2
   epochs: 50
   batch_size: 200
