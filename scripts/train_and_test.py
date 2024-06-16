@@ -114,7 +114,8 @@ def main():
     logging.info(f"Validation data: {len(validation_data.dataset)}")
     logging.info(f"Test data: {len(test_data.dataset)}\n")
 
-    label = ut.GenerateFilename()
+    file_label = ut.GenerateFilename()
+    ut.CreateDirectory(os.path.join(output_dir, file_label))
 
     # * * * * * * * * * * * * * * * *
     # TRAIN/VALIDATE
@@ -124,7 +125,11 @@ def main():
     epoch_time = []
 
     training_start_time = datetime.datetime.now()
-    ms_path = os.path.join(output_dir, label + "_model_state.pt")
+    ms_path = os.path.join(
+        output_dir,
+        file_label,
+        file_label +
+        "_model_state.pt")
 
     logging.info("Training\n")
 
@@ -165,7 +170,7 @@ def main():
         elapsed_time = ut.ElapsedSecondsSince(epoch_start_time)
         epoch_time.append(elapsed_time)
 
-        logging.info(f"Elapsed time: {ut.FormatSeconds(elapsed_time)}\n")
+        logging.info(f"Elapsed time: {ut.FormatSeconds(elapsed_time)}")
 
         logging.info(
             model.save_state(
@@ -179,7 +184,7 @@ def main():
 
         scheduler.step(avg_validation_loss)
 
-        logging.info(f"Learning rate: {optimizer.param_groups[0]['lr']}")
+        logging.info(f"Learning rate: {optimizer.param_groups[0]['lr']}\n")
 
     logging.info(
         model.save_state(
@@ -198,7 +203,7 @@ def main():
     logging.info(f"Average epoch time: {avg_epoch_time}")
     logging.info(f"Total training time: {total_training_time}\n")
 
-    tvl_path = os.path.join(output_dir, label + "_loss.csv")
+    tvl_path = os.path.join(output_dir, file_label, file_label + "_loss.csv")
     ut.SaveLoss2Csv(training_loss, validation_loss, tvl_path)
     logging.info(f"Saved training and validation loss to {tvl_path}\n")
 
@@ -210,7 +215,7 @@ def main():
     plt.ylabel('Loss')
     plt.legend()
 
-    tvplot_path = os.path.join(output_dir, label + ".png")
+    tvplot_path = os.path.join(output_dir, file_label, file_label + ".png")
     plt.savefig(tvplot_path)
     logging.info(f"Saved training and validation plot {tvplot_path}\n")
 
@@ -238,7 +243,11 @@ def main():
     avg_test_loss = test_loss / len(test_data.dataset)
     logging.info(f"Test Loss: {avg_test_loss}\n")
 
-    m_path = os.path.join(output_dir, label + "_overall_metrics.txt")
+    m_path = os.path.join(
+        output_dir,
+        file_label,
+        file_label +
+        "_overall_metrics.txt")
     ut.SaveOtherMetrics(
         [len(train_data.dataset), len(validation_data.dataset), len(test_data.dataset)],
         metrics[0],
@@ -253,12 +262,16 @@ def main():
     # * * * * * * * * * * * * * * * *
     # LATENT VARIABLES
     # * * * * * * * * * * * * * * * *
-    lvmu_path = os.path.join(output_dir, label + "_latent_variables_mu.csv")
+    lvmu_path = os.path.join(
+        output_dir,
+        file_label,
+        file_label +
+        "_latent_variables_mu.csv")
     ut.SaveLatentVariables2Csv(latent_variables_mu, lvmu_path)
     logging.info(f"Saved latent variables mean to {lvmu_path}")
 
-    lvlogvar_path = os.path.join(output_dir,
-                                 label + "_latent_variables_logvar.csv")
+    lvlogvar_path = os.path.join(output_dir, file_label,
+                                 file_label + "_latent_variables_logvar.csv")
     ut.SaveLatentVariables2Csv(latent_variables_mu, lvlogvar_path)
     logging.info(f"Saved latent variables logvar to {lvlogvar_path}")
 
