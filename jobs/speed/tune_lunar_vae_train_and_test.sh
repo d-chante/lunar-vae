@@ -28,7 +28,7 @@ env
 conda activate /home/d/d_chante/d_chante/env/lvae
 
 # Run job
-srun python /home/d/d_chante/d_chante/lunar-vae/scripts/train_and_test.py $config_file
+srun python /home/d/d_chante/d_chante/lunar-vae/scripts/train_and_test.py -c $config_file
 
 # Deactivate the environment
 conda deactivate
