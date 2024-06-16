@@ -1,3 +1,4 @@
+import argparse
 import datetime
 import logging
 import matplotlib.pyplot as plt
@@ -6,24 +7,39 @@ import os
 import sys
 import time
 import torch
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchsummary import summary
 
-from lunar_vae import VAE
-from utils import Utils
+from scripts.lunar_vae import VAE
+from scripts.utils import Utils
 
 
 def main():
 
-    if len(sys.argv) < 2:
-        print("CFG_FILEPATH required")
-        sys.exit(1)
+    # * * * * * * * * * * * * * * * *
+    # ARG PARSER
+    # * * * * * * * * * * * * * * * *
+    parser = argparse.ArgumentParser(
+        description="""
+        Train, validate, and test Lunar VAE. 
 
-    ut = Utils()
+        Example usage:
+            python3 train_and_test.py -c /home/user/lunar-vae/cfg.yml -s
+        """,
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+
+    parser.add_argument('-c', '--config', type=str, help="Path to configuration file", required=True)
+    parser.add_argument('-s', '--summary', action='store_true', help='Print model summary')
+
+    args = parser.parse_args()
 
     # * * * * * * * * * * * * * * * *
     # PARAMETERS
     # * * * * * * * * * * * * * * * *
-    dirs, config = ut.GetConfig(sys.argv[1])
+    ut = Utils()
+    
+    dirs, config = ut.GetConfig(args.config)
 
     profiles_dir = dirs['profiles_directory']
     output_dir = dirs['output_directory']
@@ -33,7 +49,6 @@ def main():
     beta = config['beta']
     num_epochs = config['epochs']
     batch_size = config['batch_size']
-    n_splits = config['n_splits']
     gpu = config['gpu']
     input_dims = (1, 120)
 
@@ -60,8 +75,10 @@ def main():
     # * * * * * * * * * * * * * * * *
     model = VAE(latent_variables).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    #summary(model, input_dims, batch_size)
-    #time.sleep(1)  # Wait a moment to print summary
+    
+    if args.summary:
+        summary(model, input_dims, batch_size)
+        time.sleep(1)  # Wait a moment to print summary
 
     # * * * * * * * * * * * * * * * *
     # DATA
@@ -192,13 +209,14 @@ def main():
 
     m_path = os.path.join(output_dir, label + "_overall_metrics.txt")
     ut.SaveOtherMetrics(
+        [len(train_data.dataset), len(validation_data.dataset), len(test_data.dataset)],
         metrics[0],
         metrics[1],
         avg_epoch_time,
         total_training_time,
         avg_test_loss,
         m_path)
-    logging.info(f"Saved overall metrics to {m_path}\n")
+    logging.info(f"Saved other metrics to {m_path}\n")
 
     # * * * * * * * * * * * * * * * *
     # LATENT VARIABLES

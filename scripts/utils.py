@@ -93,7 +93,7 @@ class Utils(object):
         TBD
         '''
         timestamp = datetime.datetime.now()
-        return timestamp.strftime("vae_%Y-%m-%d_%Hh%MUTC")
+        return timestamp.strftime("vae_%Y-%m-%d_%Hh%M")
 
     @staticmethod
     def VisualizeProfile(json_file, dims=(10, 6)):
@@ -167,6 +167,7 @@ class Utils(object):
 
     @staticmethod
     def SaveOtherMetrics(
+            data_split,
             data_mean,
             data_std,
             average_epoch_time,
@@ -174,6 +175,7 @@ class Utils(object):
             test_loss,
             filepath):
         with open(filepath, 'w') as file:
+            file.write(f"Data split [train/val/test]: {data_split[0]}/{data_split[1]}/{data_split[2]}\n")
             file.write(f"Data Mean: {data_mean}\n")
             file.write(f"Data STD: {data_std}\n")
             file.write(f"Average Epoch Time: {average_epoch_time}\n")
