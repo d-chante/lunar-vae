@@ -8,5 +8,4 @@ training_parameters:
   beta: 0.2
   epochs: 20
   batch_size: 200
-  n_splits: 5
   gpu: 0
