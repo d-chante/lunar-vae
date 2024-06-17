@@ -36,4 +36,9 @@ conda deactivate
 # End job
 exit
 EOF
+
+# Add a slight delay so that each job
+# has a unique label (HH:mm:ss)
+sleep 10
+
 done

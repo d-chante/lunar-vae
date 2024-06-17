@@ -93,7 +93,7 @@ class Utils(object):
         TBD
         '''
         timestamp = datetime.datetime.now()
-        return timestamp.strftime("vae_%Y-%m-%d_%Hh%M")
+        return timestamp.strftime("vae_%Y-%m-%d_%Hh%Mm%S")
 
     @staticmethod
     def VisualizeProfile(json_file, dims=(10, 6)):
