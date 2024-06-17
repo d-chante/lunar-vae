@@ -5,6 +5,9 @@ config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning"
 config_files=($(ls ${config_dir}/*.yaml))
 
 for config_file in "${config_files[@]}"; do
+    # Add a slight delay so that each job
+    # has a unique label (HH:mm:ss)
+    sleep 10
     sbatch <<EOF
 #!/encs/bin/tcsh
 
