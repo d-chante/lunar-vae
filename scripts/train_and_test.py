@@ -10,8 +10,8 @@ import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchsummary import summary
 
-from scripts.lunar_vae import VAE
-from scripts.utils import Utils
+from lunar_vae import VAE
+from utils import Utils
 
 
 def main():
