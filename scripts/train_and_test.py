@@ -123,8 +123,7 @@ def main():
             optimizer,
             mode='min',
             factor=factor,
-            patience=patience,
-            verbose=True)
+            patience=patience)
 
         if args.show:
             summary(model, input_dims, batch_size)
