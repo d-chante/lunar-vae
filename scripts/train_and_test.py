@@ -277,7 +277,7 @@ def main():
                 latent_variables_logvar.append(logvar.cpu().numpy())
                 loss = VAE.loss_function(
                     reconstructed, batch, mu, logvar, beta)
-                test_loss = loss.item()
+                test_loss += loss.item()
 
         avg_test_loss = test_loss / len(test_data.dataset)
         logging.info(f"Test Loss: {avg_test_loss}\n")
