@@ -47,9 +47,6 @@ class Utils(object):
         data = np.stack(profiles, axis=0)
         np.random.shuffle(data)
 
-        mean = np.mean(data)
-        std = np.std(data)
-
         data = np.expand_dims(data, axis=1)
 
         remainder_data, test_data = train_test_split(
@@ -57,6 +54,9 @@ class Utils(object):
 
         train_data, validation_data = train_test_split(
             remainder_data, test_size=0.1, random_state=42)
+        
+        mean = np.mean(train_data)
+        std = np.std(train_data)
         
         train_data = self.Normalize(train_data, mean, std)
         train_tensor = torch.tensor(train_data, dtype=torch.float32)
