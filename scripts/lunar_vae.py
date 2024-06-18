@@ -23,80 +23,80 @@ class VAE(nn.Module):
         self.encoder = nn.Sequential(
             # 1e
             Wrap1d(padding=1),
+            # 2e
             nn.ConstantPad1d(
                 padding=3,
                 value=0),
-            # 2e
+            # 3e
             nn.Conv1d(
                 in_channels=1,
                 out_channels=32,
                 kernel_size=3,
                 stride=1,
                 padding=1),
-            # 3e
             nn.BatchNorm1d(32),
             nn.ReLU(),
-            nn.Conv1d(
-                in_channels=32,
-                out_channels=32,
-                kernel_size=2,
-                stride=2,
-                padding=0),
             # 4e
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.Conv1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 5e
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.Conv1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 6e
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.Conv1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 7e
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.Conv1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 8e
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.Conv1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 9e
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.Conv1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 10e
+            nn.Conv1d(
+                in_channels=32,
+                out_channels=32,
+                kernel_size=2,
+                stride=2,
+                padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU())
 
@@ -124,63 +124,63 @@ class VAE(nn.Module):
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 2d
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.ConvTranspose1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 3d
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.ConvTranspose1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 4d
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.ConvTranspose1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 5d
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.ConvTranspose1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 6d
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.ConvTranspose1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
             # 7d
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
             nn.ConvTranspose1d(
                 in_channels=32,
                 out_channels=32,
                 kernel_size=2,
                 stride=2,
                 padding=0),
-            # 8d
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            # 8d
             nn.Conv1d(
                 in_channels=32,
                 out_channels=1,

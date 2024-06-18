@@ -45,14 +45,10 @@ class Utils(object):
                 profiles.append(p)
 
         data = np.stack(profiles, axis=0)
+        np.random.shuffle(data)
 
         mean = np.mean(data)
         std = np.std(data)
-        data = (data - mean) / std
-
-        data_min = np.min(data)
-        data_max = np.max(data)
-        data = (data - data_min) / (data_max - data_min)
 
         data = np.expand_dims(data, axis=1)
 
@@ -60,19 +56,32 @@ class Utils(object):
             data, test_size=0.1, random_state=42)
 
         train_data, validation_data = train_test_split(
-            remainder_data, test_size=0.2, random_state=42)
-
+            remainder_data, test_size=0.1, random_state=42)
+        
+        train_data = self.Normalize(train_data, mean, std)
         train_tensor = torch.tensor(train_data, dtype=torch.float32)
         train_loader = DataLoader(train_tensor, batch_size, shuffle=True)
 
+        validation_data = self.Normalize(validation_data, mean, std)
         validation_tensor = torch.tensor(validation_data, dtype=torch.float32)
         validation_loader = DataLoader(
-            validation_tensor, batch_size, shuffle=True)
+            validation_tensor, batch_size, shuffle=False)
 
+        test_data = self.Normalize(test_data, mean, std)
         test_tensor = torch.tensor(test_data, dtype=torch.float32)
-        test_loader = DataLoader(test_tensor, batch_size, shuffle=True)
+        test_loader = DataLoader(test_tensor, batch_size, shuffle=False)
 
         return [train_loader, validation_loader, test_loader], [mean, std]
+    
+    @staticmethod
+    def Normalize(data, mean, std):
+        '''
+        TBD
+        '''
+        data_norm = (data - mean) / std
+        data_min = np.min(data_norm)
+        data_max = np.max(data_norm)
+        return (data_norm - data_min) / (data_max - data_min)
 
     @staticmethod
     def GetConfig(config_filepath):
@@ -180,6 +189,8 @@ class Utils(object):
             final_learning_rate,
             average_epoch_time,
             total_training_time,
+            training_loss,
+            validation_loss,
             test_loss,
             filepath):
         with open(filepath, 'w') as file:
@@ -190,4 +201,6 @@ class Utils(object):
             file.write(f"Final learning rate: {final_learning_rate}\n")
             file.write(f"Average epoch time: {average_epoch_time}\n")
             file.write(f"Total training time: {total_training_time}\n")
+            file.write(f"Average training loss: {training_loss}\n")
+            file.write(f"Average validation loss: {validation_loss}\n")
             file.write(f"Test loss: {test_loss}\n")

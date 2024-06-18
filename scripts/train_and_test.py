@@ -10,8 +10,8 @@ import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchsummary import summary
 
-from lunar_vae import VAE
-from utils import Utils
+from scripts.lunar_vae import VAE
+from scripts.utils import Utils
 
 
 def main():
@@ -294,6 +294,8 @@ def main():
             optimizer.param_groups[0]['lr'],
             avg_epoch_time,
             total_training_time,
+            avg_training_loss,
+            avg_validation_loss,
             avg_test_loss,
             m_path)
         logging.info(f"Saved other metrics to {m_path}")
