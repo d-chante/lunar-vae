@@ -17,7 +17,7 @@ class Wrap1d(nn.Module):
 
 class VAE(nn.Module):
 
-    def __init__(self, latent_variables):
+    def __init__(self, latent_variables, dropout):
         super(VAE, self).__init__()
 
         self.encoder = nn.Sequential(
@@ -36,6 +36,7 @@ class VAE(nn.Module):
                 padding=1),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 4e
             nn.Conv1d(
                 in_channels=32,
@@ -45,6 +46,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 5e
             nn.Conv1d(
                 in_channels=32,
@@ -54,6 +56,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 6e
             nn.Conv1d(
                 in_channels=32,
@@ -63,6 +66,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 7e
             nn.Conv1d(
                 in_channels=32,
@@ -72,6 +76,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 8e
             nn.Conv1d(
                 in_channels=32,
@@ -81,6 +86,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 9e
             nn.Conv1d(
                 in_channels=32,
@@ -90,6 +96,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 10e
             nn.Conv1d(
                 in_channels=32,
@@ -126,6 +133,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 2d
             nn.ConvTranspose1d(
                 in_channels=32,
@@ -135,6 +143,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 3d
             nn.ConvTranspose1d(
                 in_channels=32,
@@ -144,6 +153,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 4d
             nn.ConvTranspose1d(
                 in_channels=32,
@@ -153,6 +163,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 5d
             nn.ConvTranspose1d(
                 in_channels=32,
@@ -162,6 +173,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 6d
             nn.ConvTranspose1d(
                 in_channels=32,
@@ -171,6 +183,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 7d
             nn.ConvTranspose1d(
                 in_channels=32,
@@ -180,6 +193,7 @@ class VAE(nn.Module):
                 padding=0),
             nn.BatchNorm1d(32),
             nn.ReLU(),
+            nn.Dropout(dropout),
             # 8d
             nn.Conv1d(
                 in_channels=32,
