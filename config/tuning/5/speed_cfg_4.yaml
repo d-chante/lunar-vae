@@ -11,4 +11,4 @@ training_parameters:
   epochs: 50
   batch_size: 200
   gpu: 0
-  dropout: 0.05
+  dropout: 0.5
