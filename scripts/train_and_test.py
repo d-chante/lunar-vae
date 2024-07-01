@@ -69,7 +69,6 @@ def main():
         num_epochs = config['epochs']
         batch_size = config['batch_size']
         gpu = config['gpu']
-        dropout = config['dropout']
 
         input_dims = (1, 120)
 
@@ -107,7 +106,6 @@ def main():
         logging.info(f"Number of Epochs: {num_epochs}")
         logging.info(f"Batch Size: {batch_size}")
         logging.info(f"GPU: {gpu}\n")
-        logging.info(f"Dropout: {dropout}\n")
 
         # * * * * * * * * * * * * * * * *
         # DEVICE
@@ -119,7 +117,7 @@ def main():
         # * * * * * * * * * * * * * * * *
         # MODEL
         # * * * * * * * * * * * * * * * *
-        model = VAE(latent_variables, dropout).to(device)
+        model = VAE(latent_variables).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
         scheduler = ReduceLROnPlateau(
             optimizer,
