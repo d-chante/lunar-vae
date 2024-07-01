@@ -32,7 +32,7 @@ class Utils(object):
                 f"Error trying to open JSON file {json_file} : ({e})")
             return None
 
-    def LoadData(self, data_dir, batch_size):
+    def LoadData(self, data_dir, batch_size=200, tensor=True):
         '''
         TBD
         '''
@@ -43,35 +43,41 @@ class Utils(object):
             p = self.Json2Profile(os.path.join(data_dir, profile))
             if p is not None:
                 profiles.append(p)
-
-        data = np.stack(profiles, axis=0)
-        np.random.shuffle(data)
-
-        data = np.expand_dims(data, axis=1)
-
-        remainder_data, test_data = train_test_split(
-            data, test_size=0.1, random_state=42)
-
-        train_data, validation_data = train_test_split(
-            remainder_data, test_size=0.1, random_state=42)
         
-        mean = np.mean(train_data)
-        std = np.std(train_data)
-        
-        train_data = self.Normalize(train_data, mean, std)
-        train_tensor = torch.tensor(train_data, dtype=torch.float32)
-        train_loader = DataLoader(train_tensor, batch_size, shuffle=True)
+        if tensor:
+            data = np.stack(profiles, axis=0)
+            np.random.shuffle(data)
 
-        validation_data = self.Normalize(validation_data, mean, std)
-        validation_tensor = torch.tensor(validation_data, dtype=torch.float32)
-        validation_loader = DataLoader(
-            validation_tensor, batch_size, shuffle=False)
+            data = np.expand_dims(data, axis=1)
 
-        test_data = self.Normalize(test_data, mean, std)
-        test_tensor = torch.tensor(test_data, dtype=torch.float32)
-        test_loader = DataLoader(test_tensor, batch_size, shuffle=False)
+            remainder_data, test_data = train_test_split(
+                data, test_size=0.1, random_state=42)
 
-        return [train_loader, validation_loader, test_loader], [mean, std]
+            train_data, validation_data = train_test_split(
+                remainder_data, test_size=0.1, random_state=42)
+            
+            mean = np.mean(train_data)
+            std = np.std(train_data)
+
+            train_data = self.Normalize(train_data, mean, std)
+            train_tensor = torch.tensor(train_data, dtype=torch.float32)
+            train_loader = DataLoader(train_tensor, batch_size, shuffle=True)
+
+            validation_data = self.Normalize(validation_data, mean, std)
+            validation_tensor = torch.tensor(validation_data, dtype=torch.float32)
+            validation_loader = DataLoader(
+                validation_tensor, batch_size, shuffle=False)
+
+            test_data = self.Normalize(test_data, mean, std)
+            test_tensor = torch.tensor(test_data, dtype=torch.float32)
+            test_loader = DataLoader(test_tensor, batch_size, shuffle=False)
+
+            ret = [train_loader, validation_loader, test_loader], [mean, std]
+
+        else:
+            ret = profiles
+
+        return ret
     
     @staticmethod
     def Normalize(data, mean, std):
