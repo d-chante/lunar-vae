@@ -1,20 +1,20 @@
 #!/bin/bash
 
-config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning/5"
+config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning/6"
 
 config_files=($(ls ${config_dir}/*.yaml))
 
 for config_file in "${config_files[@]}"; do
     # Add a slight delay so that each job
     # has a unique label (HH:mm:ss)
-    sleep 10
+    sleep 30
     sbatch <<EOF
 #!/encs/bin/tcsh
 
 #SBATCH --job-name=lvae_train_and_test
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=chantelle.dubois@mail.concordia.ca
-#SBATCH --time=1-00:00:00
+#SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
