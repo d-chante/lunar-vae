@@ -1,6 +1,6 @@
 directories:
   profiles_directory: "/home/d/d_chante/d_chante/diviner_data/data/profiles"
-  output_directory: "/home/d/d_chante/d_chante/diviner_data/data/output/5"
+  output_directory: "/home/d/d_chante/d_chante/diviner_data/data/output/6"
 
 training_parameters:
   latent_variables: 4
@@ -11,4 +11,3 @@ training_parameters:
   epochs: 200
   batch_size: 200
   gpu: 0
-  dropout: 0.10

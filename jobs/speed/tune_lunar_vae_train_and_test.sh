@@ -1,24 +1,24 @@
 #!/bin/bash
 
-config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning/6"
+config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning/7"
 
 config_files=($(ls ${config_dir}/*.yaml))
 
 for config_file in "${config_files[@]}"; do
     # Add a slight delay so that each job
     # has a unique label (HH:mm:ss)
-    sleep 30
+    sleep 10
     sbatch <<EOF
 #!/encs/bin/tcsh
 
 #SBATCH --job-name=lvae_train_and_test
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=chantelle.dubois@mail.concordia.ca
-#SBATCH --time=7-00:00:00
+#SBATCH --time=2-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=15G
+#SBATCH --mem=8G
 #SBATCH --gpus=1
 
 # Load anaconda module
