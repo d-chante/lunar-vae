@@ -1,6 +1,17 @@
 #!/bin/bash
 
-config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning/7b"
+if [ -z "$1" ]; then
+    echo "Usage: $0 <tuning id>"
+    exit 1
+fi
+
+tuning_id="$1"
+config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning/${tuning_id}"
+
+if [ ! -d "$config_dir" ]; then
+    echo "Error: Directory $config_dir does not exist."
+    exit 1
+fi
 
 config_files=($(ls ${config_dir}/*.yaml))
 
