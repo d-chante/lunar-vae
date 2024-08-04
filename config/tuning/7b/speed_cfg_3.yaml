@@ -1,6 +1,6 @@
 directories:
   profiles_directory: "/home/d/d_chante/d_chante/diviner_data/data/profiles"
-  output_directory: "/home/d/d_chante/d_chante/diviner_data/data/output/7"
+  output_directory: "/home/d/d_chante/d_chante/diviner_data/data/output/7b"
 
 training_parameters:
   latent_variables: 4

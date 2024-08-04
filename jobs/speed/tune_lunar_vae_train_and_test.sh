@@ -1,6 +1,6 @@
 #!/bin/bash
 
-config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning/7"
+config_dir="/home/d/d_chante/d_chante/lunar-vae/config/tuning/7b"
 
 config_files=($(ls ${config_dir}/*.yaml))
 
