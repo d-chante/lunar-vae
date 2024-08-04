@@ -8,7 +8,7 @@ training_parameters:
   patience: 5
   factor: 0.1
   beta: 0.2
+  dropout: 0.25
   epochs: 50
   batch_size: 200
   gpu: 0
-  dropout: 0.25

@@ -66,6 +66,7 @@ def main():
         patience = config['patience']
         factor = config['factor']
         beta = config['beta']
+        dropout = config['dropout']
         num_epochs = config['epochs']
         batch_size = config['batch_size']
         gpu = config['gpu']
@@ -103,6 +104,7 @@ def main():
         logging.info(f"Patience: {patience}")
         logging.info(f"Factor: {factor}")
         logging.info(f"Beta: {beta}")
+        logging.info(f"Dropout: {dropout}")
         logging.info(f"Number of Epochs: {num_epochs}")
         logging.info(f"Batch Size: {batch_size}")
         logging.info(f"GPU: {gpu}\n")
@@ -117,7 +119,7 @@ def main():
         # * * * * * * * * * * * * * * * *
         # MODEL
         # * * * * * * * * * * * * * * * *
-        model = VAE(latent_variables).to(device)
+        model = VAE(latent_variables, dropout).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
         scheduler = ReduceLROnPlateau(
             optimizer,
