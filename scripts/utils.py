@@ -82,12 +82,9 @@ class Utils(object):
     @staticmethod
     def Normalize(data, mean, std):
         '''
-        TBD
+        TBD - Z-score normalization
         '''
-        data_norm = (data - mean) / std
-        data_min = np.min(data_norm)
-        data_max = np.max(data_norm)
-        return (data_norm - data_min) / (data_max - data_min)
+        return (data - mean) / std
 
     @staticmethod
     def GetConfig(config_filepath):

@@ -7,7 +7,7 @@ training_parameters:
   learning_rate: 1e-3
   patience: 5
   factor: 0.1
-  beta: 2.0
+  beta: 0.75
   dropout: 0
   epochs: 500
   batch_size: 200
