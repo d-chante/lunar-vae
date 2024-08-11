@@ -224,8 +224,16 @@ class VAE(nn.Module):
 
     @staticmethod
     def loss_function(recon_x, x, mu, logvar, beta):
-        reconstruction_loss = nn.functional.mse_loss(
-            recon_x, x, reduction='sum')
+        '''
+        @brief The reconstruction loss calculated using
+            the "Evidence Lower Bound" (ELBO) technique
+        @param recon_x TBD
+        @param x TBD
+        @param mu TBD
+        @param logvar TBD
+        @param beta TBD
+        '''
+        reconstruction_loss = nn.functional.l1_loss(recon_x, x, reduction='sum')
         kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return reconstruction_loss + beta * kl_divergence
 
