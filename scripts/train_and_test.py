@@ -121,11 +121,10 @@ def main():
         # * * * * * * * * * * * * * * * *
         model = VAE(latent_variables, dropout).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        scheduler = ExponentialLR(optimizer, gamma=0.9)
+        scheduler = ExponentialLR(optimizer, gamma=0.95)
 
         if args.show:
             summary(model, input_dims, batch_size)
-            time.sleep(1)  # Wait a moment to print summary
 
         # * * * * * * * * * * * * * * * *
         # DATA
@@ -161,8 +160,10 @@ def main():
         logging.info("Training start\n")
 
         for epoch in range(num_epochs):
-            logging.info(f"Epoch {epoch} of {num_epochs}")
+            logging.info(f"Epoch {epoch+1} of {num_epochs}")
             epoch_start_time = datetime.datetime.now()
+
+            best_val_loss = float('inf')
 
             model.train()
             total_training_loss = 0
@@ -179,6 +180,8 @@ def main():
             avg_training_loss = total_training_loss / len(train_data.dataset)
             training_loss.append(avg_training_loss)
             logging.info(f"Training Loss: {avg_training_loss}")
+
+            scheduler.step()
 
             model.eval()
             total_validation_loss = 0
@@ -200,29 +203,19 @@ def main():
 
             logging.info(f"Elapsed time: {ut.FormatSeconds(elapsed_time)}")
 
-            logging.info(
-                model.save_state(
-                    epoch,
-                    model,
-                    optimizer,
-                    scheduler,
-                    avg_training_loss,
-                    avg_validation_loss,
-                    ms_path))
-
-            scheduler.step()
+            if total_validation_loss < best_val_loss:
+                best_val_loss = total_validation_loss
+                logging.info(
+                    model.save_state(
+                        epoch+1,
+                        model,
+                        optimizer,
+                        scheduler,
+                        avg_training_loss,
+                        avg_validation_loss,
+                        ms_path))
 
             logging.info(f"Learning rate: {optimizer.param_groups[0]['lr']}\n")
-
-        logging.info(
-            model.save_state(
-                epoch,
-                model,
-                optimizer,
-                scheduler,
-                avg_training_loss,
-                avg_validation_loss,
-                ms_path))
 
         avg_epoch_time = ut.FormatSeconds(sum(epoch_time) / num_epochs)
         total_training_time = ut.FormatSeconds(
