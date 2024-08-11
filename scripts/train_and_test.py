@@ -166,7 +166,7 @@ def main():
             best_val_loss = float('inf')
 
             model.train()
-            total_training_loss = 0
+            epoch_training_loss = 0
             for batch in train_data:
                 batch = batch.to(device)
                 optimizer.zero_grad()
@@ -175,25 +175,25 @@ def main():
                     reconstructed, batch, mu, logvar, beta)
                 loss.backward()
                 optimizer.step()
-                total_training_loss += loss.item()
+                epoch_training_loss += loss.item()
 
-            avg_training_loss = total_training_loss / len(train_data.dataset)
+            avg_training_loss = epoch_training_loss / len(train_data.dataset)
             training_loss.append(avg_training_loss)
             logging.info(f"Training Loss: {avg_training_loss}")
 
             scheduler.step()
 
             model.eval()
-            total_validation_loss = 0
+            epoch_validation_loss = 0
             with torch.no_grad():
                 for batch in validation_data:
                     batch = batch.to(device)
                     reconstructed, mu, logvar = model(batch)
                     loss = VAE.loss_function(
                         reconstructed, batch, mu, logvar, beta)
-                    total_validation_loss += loss.item()
+                    epoch_validation_loss += loss.item()
 
-            avg_validation_loss = total_validation_loss / \
+            avg_validation_loss = epoch_validation_loss / \
                 len(validation_data.dataset)
             validation_loss.append(avg_validation_loss)
             logging.info(f"Validation Loss: {avg_validation_loss}")
@@ -203,8 +203,8 @@ def main():
 
             logging.info(f"Elapsed time: {ut.FormatSeconds(elapsed_time)}")
 
-            if total_validation_loss < best_val_loss:
-                best_val_loss = total_validation_loss
+            if avg_validation_loss < best_val_loss:
+                best_val_loss = avg_validation_loss
                 logging.info(
                     model.save_state(
                         epoch+1,
