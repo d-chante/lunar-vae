@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import time
 import torch
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import ExponentialLR
 from torchsummary import summary
 
 from lunar_vae import VAE
@@ -121,11 +121,7 @@ def main():
         # * * * * * * * * * * * * * * * *
         model = VAE(latent_variables, dropout).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        scheduler = ReduceLROnPlateau(
-            optimizer,
-            mode='min',
-            factor=factor,
-            patience=patience)
+        scheduler = ExponentialLR(optimizer, gamma=0.9)
 
         if args.show:
             summary(model, input_dims, batch_size)
@@ -214,7 +210,7 @@ def main():
                     avg_validation_loss,
                     ms_path))
 
-            scheduler.step(avg_validation_loss)
+            scheduler.step()
 
             logging.info(f"Learning rate: {optimizer.param_groups[0]['lr']}\n")
 
@@ -318,7 +314,7 @@ def main():
             file_label,
             file_label +
             "_latent_variables_logvar.csv")
-        ut.SaveLatentVariables2Csv(latent_variables_mu, lvlogvar_path)
+        ut.SaveLatentVariables2Csv(latent_variables_logvar, lvlogvar_path)
         logging.info(f"Saved latent variables logvar to {lvlogvar_path}")
 
 
