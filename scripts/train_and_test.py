@@ -5,7 +5,6 @@ import datetime
 import logging
 import matplotlib.pyplot as plt
 import os
-import time
 import torch
 from torch.optim.lr_scheduler import ExponentialLR
 from torchsummary import summary
@@ -63,8 +62,7 @@ def main():
 
         latent_variables = config['latent_variables']
         learning_rate = float(config['learning_rate'])
-        patience = config['patience']
-        factor = config['factor']
+        gamma = float(config['gamma'])
         beta = config['beta']
         dropout = config['dropout']
         num_epochs = config['epochs']
@@ -101,8 +99,7 @@ def main():
 
         logging.info(f"Latent Variables: {latent_variables}")
         logging.info(f"Learning Rate: {learning_rate}")
-        logging.info(f"Patience: {patience}")
-        logging.info(f"Factor: {factor}")
+        logging.info(f"Gamma: {gamma}")
         logging.info(f"Beta: {beta}")
         logging.info(f"Dropout: {dropout}")
         logging.info(f"Number of Epochs: {num_epochs}")
@@ -121,10 +118,10 @@ def main():
         # * * * * * * * * * * * * * * * *
         model = VAE(latent_variables, dropout).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        scheduler = ExponentialLR(optimizer, gamma=0.95)
+        scheduler = ExponentialLR(optimizer, gamma=gamma)
 
         if args.show:
-            summary(model, input_dims, batch_size)
+            summary(model, input_dims)
 
         # * * * * * * * * * * * * * * * *
         # DATA
