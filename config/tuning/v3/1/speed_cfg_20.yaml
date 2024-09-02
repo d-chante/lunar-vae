@@ -1,4 +1,4 @@
-# Batch Size
+# Epoch
 directories:
   profiles_directory: "/home/d/d_chante/d_chante/diviner_data/data/profiles"
   output_directory: "/home/d/d_chante/d_chante/diviner_data/data/output/v3/1"
@@ -9,6 +9,6 @@ training_parameters:
   gamma: 0.99
   beta: 0.2
   dropout: 0
-  epochs: 50
-  batch_size: 1000
+  epochs: 250
+  batch_size: 200
   gpu: 0

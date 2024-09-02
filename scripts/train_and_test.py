@@ -81,7 +81,7 @@ def main():
         # LOGGER
         # * * * * * * * * * * * * * * * *
         logging.basicConfig(
-            level=logging.DEBUG,  # Set the base logging level
+            level=logging.DEBUG,  
             format='%(asctime)s - %(levelname)s - %(message)s',
             handlers=[
                 logging.FileHandler(

@@ -1,3 +1,4 @@
+# Batch Size
 directories:
   profiles_directory: "/home/d/d_chante/d_chante/diviner_data/data/profiles"
   output_directory: "/home/d/d_chante/d_chante/diviner_data/data/output/v3/1"

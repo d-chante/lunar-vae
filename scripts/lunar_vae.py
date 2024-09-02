@@ -231,7 +231,10 @@ class VAE(nn.Module):
         @param x TBD
         @param mu TBD
         @param logvar TBD
-        @param beta TBD
+        @param beta Weight for the KL Divergence (higher beta == enforces
+            learning a latent space with a normal distribution at the cost of
+            reconstruction quality, lower beta == enforces higher quality 
+            reconstruction at the cost of a latent space's normal distribution)
         '''
         reconstruction_loss = nn.functional.l1_loss(recon_x, x, reduction='sum')
         kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
