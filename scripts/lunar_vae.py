@@ -262,3 +262,17 @@ class VAE(nn.Module):
         }
         torch.save(checkpoint, filepath)
         return f"Saved state to {filepath}"
+    
+    @staticmethod
+    def load_state(state_path, latent_variables=4, dropout=0, device='cpu'):
+        '''
+        @brief Loads and returns a VAE model state
+        @param state_path Filepath to the state model dictionary
+        @param latent_variables Number of latent variables
+        @param dropout Dropout layer percentage (0.0-1.0)
+        @param device Target CPU or GPU
+        '''
+        checkpoint = torch.load(state_path, map_location=device)
+        model = VAE(latent_variables, dropout)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        return model
