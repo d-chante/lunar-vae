@@ -1,7 +1,7 @@
 # Batch Size
 directories:
   profiles_directory: "/home/d/d_chante/d_chante/diviner_data/data/profiles"
-  output_directory: "/home/d/d_chante/d_chante/diviner_data/data/output/v3/1"
+  output_directory: "/home/d/d_chante/d_chante/diviner_data/data/output/v3/1b"
 
 training_parameters:
   latent_variables: 4
@@ -10,5 +10,5 @@ training_parameters:
   beta: 0.2
   dropout: 0
   epochs: 50
-  batch_size: 200
+  batch_size: 100
   gpu: 0
