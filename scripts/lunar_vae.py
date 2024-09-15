@@ -213,7 +213,7 @@ class VAE(nn.Module):
                 stride=1,
                 padding=0),
             # 9d
-            Crop1d(crop_size=4)
+            Crop1d(crop_size=4))
 
     def encode(self, x):
         h = self.encoder(x)
