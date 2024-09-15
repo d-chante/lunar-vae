@@ -5,15 +5,25 @@ import torch.nn.functional as F
 
 
 class Wrap1d(nn.Module):
-    def __init__(self, padding):
+    def __init__(self, wrap_size=1):
         super(Wrap1d, self).__init__()
-        self.padding = padding
+        self.wrap_size = wrap_size
 
     def forward(self, x):
-        x = torch.cat([x[:, :, -self.padding:], x,
-                      x[:, :, :self.padding]], dim=2)
-        return x
+        wrapped_part_start = x[:, :, -self.wrap_size:]  
+        wrapped_part_end = x[:, :, :self.wrap_size]  
+        x_wrapped = torch.cat([wrapped_part_start, x, wrapped_part_end], dim=2) 
+        return x_wrapped
+    
+class Crop1d(nn.Module):
+    def __init__(self, crop_size):
+        super(Crop1d, self).__init__()
+        self.crop_size = crop_size
 
+    def forward(self, x):
+        start = self.crop_size
+        end = -self.crop_size if self.crop_size != 0 else None
+        return x[:, :, start:end]
 
 class VAE(nn.Module):
 
@@ -22,7 +32,7 @@ class VAE(nn.Module):
 
         self.encoder = nn.Sequential(
             # 1e
-            Wrap1d(padding=1),
+            Wrap1d(wrap_size=1),
             # 2e
             nn.ConstantPad1d(
                 padding=3,
@@ -203,7 +213,7 @@ class VAE(nn.Module):
                 stride=1,
                 padding=0),
             # 9d
-            nn.ConstantPad1d(padding=-4, value=0))
+            Crop1d(crop_size=4)
 
     def encode(self, x):
         h = self.encoder(x)
