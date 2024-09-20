@@ -232,22 +232,23 @@ class VAE(nn.Module):
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
 
-    @staticmethod
-    def loss_function(recon_x, x, mu, logvar, beta):
+    def reconstruction_loss(self, recon_x, x):
+        return nn.functional.mse_loss(recon_x, x, reduction='sum')
+
+    def kl_divergence(self, logvar, mu):
+        return -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+
+    def elbo_loss(self, reconstruction_loss, kl_divergence, beta):
         '''
         @brief The reconstruction loss calculated using
             the "Evidence Lower Bound" (ELBO) technique
-        @param recon_x TBD
-        @param x TBD
-        @param mu TBD
-        @param logvar TBD
+        @param reconstruction_loss TBD
+        @param kl_divergence TBD
         @param beta Weight for the KL Divergence (higher beta == enforces
             learning a latent space with a normal distribution at the cost of
             reconstruction quality, lower beta == enforces higher quality 
             reconstruction at the cost of a latent space's normal distribution)
         '''
-        reconstruction_loss = nn.functional.l1_loss(recon_x, x, reduction='sum')
-        kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return reconstruction_loss + beta * kl_divergence
 
     @staticmethod
