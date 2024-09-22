@@ -156,11 +156,11 @@ def main():
 
         logging.info("Training start\n")
 
+        best_val_loss = float('inf')
+
         for epoch in range(num_epochs):
             logging.info(f"Epoch {epoch+1} of {num_epochs}")
             epoch_start_time = datetime.datetime.now()
-
-            best_val_loss = float('inf')
 
             model.train()
             epoch_training_loss = 0
@@ -168,11 +168,12 @@ def main():
                 batch = batch.to(device)
                 optimizer.zero_grad()
                 reconstructed, mu, logvar = model(batch)
-                loss = VAE.loss_function(
-                    reconstructed, batch, mu, logvar, beta)
-                loss.backward()
+                reconstruction_loss = VAE.reconstruction_loss(reconstructed, batch)
+                kl_divergence = VAE.kl_divergence(logvar, mu)
+                elbo_loss = VAE.elbo_loss(reconstruction_loss, kl_divergence, beta)
+                elbo_loss.backward()
                 optimizer.step()
-                epoch_training_loss += loss.item()
+                epoch_training_loss += elbo_loss.item()
 
             avg_training_loss = epoch_training_loss / len(train_data.dataset)
             training_loss.append(avg_training_loss)
