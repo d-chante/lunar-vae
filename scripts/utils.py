@@ -164,10 +164,17 @@ class Utils(object):
         os.makedirs(dirpath, exist_ok=True)
 
     @staticmethod
-    def SaveLoss2Csv(training_loss, validation_loss, filepath):
-        df = pd.DataFrame({'training_loss': training_loss,
-                          'validation_loss': validation_loss})
-        df.to_csv(filepath, index=False)
+    def SaveLoss2Csv(
+            training_reconstruction_loss, training_kl_divergence, training_elbo_loss, 
+            validation_reconstruction_loss, validation_kl_divergence, validation_elbo_loss, 
+            filepath):
+        df = pd.DataFrame({'training_reconstruction_loss': training_reconstruction_loss,
+                           'training_kl_divergence': training_kl_divergence,
+                           'training_elbo_loss': training_elbo_loss,
+                           'validation_reconstruction_loss': validation_reconstruction_loss,
+                           'validation_kl_divergence': validation_kl_divergence,
+                           'validation_elbo_loss': validation_elbo_loss})
+        df.to_csv(filepath, index=True)
 
     @staticmethod
     def SaveLatentVariables2Csv(array, filepath):
@@ -182,28 +189,55 @@ class Utils(object):
                 'latent_variable_2',
                 'latent_variable_3',
                 'latent_variable_4'])
-        df.to_csv(filepath, index=False)
+        df.to_csv(filepath, index=True)
 
     @staticmethod
-    def SaveOtherMetrics(
-            data_split,
-            data_mean,
-            data_std,
-            final_learning_rate,
-            average_epoch_time,
-            total_training_time,
-            training_loss,
-            validation_loss,
-            test_loss,
-            filepath):
-        with open(filepath, 'w') as file:
-            file.write(
-                f"Data split [train/val/test]: {data_split[0]}/{data_split[1]}/{data_split[2]}\n")
-            file.write(f"Data mean: {data_mean}\n")
-            file.write(f"Data standard deviation: {data_std}\n")
-            file.write(f"Final learning rate: {final_learning_rate}\n")
-            file.write(f"Average epoch time: {average_epoch_time}\n")
-            file.write(f"Total training time: {total_training_time}\n")
-            file.write(f"Average training loss: {training_loss}\n")
-            file.write(f"Average validation loss: {validation_loss}\n")
-            file.write(f"Test loss: {test_loss}\n")
+    def SaveMetrics(
+        label,
+        config_file,
+        latent_variables,
+        learning_rate,
+        gamma,
+        beta,
+        dropout,
+        num_epochs,
+        batch_size,
+        gpu,
+        data_split,
+        data_mean,
+        data_std,
+        final_learning_rate,
+        average_epoch_time,
+        total_training_time,
+        training_loss,
+        validation_loss,
+        test_loss,
+        filepath
+    ):
+        df = pd.DataFrame({
+            'label': [label],
+            'config_file': [config_file],
+            'latent_variables': [latent_variables],
+            'learning_rate': [learning_rate],
+            'gamma': [gamma],
+            'beta': [beta],
+            'dropout': [dropout],
+            'num_epochs': [num_epochs],
+            'batch_size': [batch_size],
+            'gpu': [gpu],
+            'data_split': [data_split],
+            'data_mean': [data_mean],
+            'data_std': [data_std],
+            'final_learning_rate': [final_learning_rate],
+            'average_epoch_time': [average_epoch_time],
+            'total_training_time': [total_training_time],
+            'training_loss': [training_loss],
+            'validation_loss': [validation_loss],
+            'test_loss': [test_loss],
+            'training_loss_kelvins': [training_loss * data_std],
+            'validation_loss_kelvins': [validation_loss * data_std],
+            'test_loss_kelvins': [test_loss * data_std]
+        })
+        
+        file_exists = os.path.isfile(filepath)
+        df.to_csv(filepath, mode='a' if file_exists else 'w', index=False, header=not file_exists)

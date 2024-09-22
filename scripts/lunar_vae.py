@@ -234,10 +234,10 @@ class VAE(nn.Module):
 
     @staticmethod
     def reconstruction_loss(recon_x, x):
-        return nn.functional.mse_loss(recon_x, x, reduction='sum')
+        return nn.functional.l1_loss(recon_x, x, reduction='mean')
 
     @staticmethod
-    def kl_divergence(self, logvar, mu):
+    def kl_divergence(logvar, mu):
         return -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
     @staticmethod
@@ -252,7 +252,7 @@ class VAE(nn.Module):
             reconstruction quality, lower beta == enforces higher quality 
             reconstruction at the cost of a latent space's normal distribution)
         '''
-        return VAE.reconstruction_loss + beta * VAE.kl_divergence
+        return reconstruction_loss + beta * kl_divergence
 
     @staticmethod
     def save_state(
