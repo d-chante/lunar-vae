@@ -186,7 +186,7 @@ def main():
 
                 # Loss Calculation
                 reconstruction_loss = VAE.reconstruction_loss(reconstructed, batch)
-                kl_divergence = VAE.kl_divergence(logvar, mu) / batch.size(0)
+                kl_divergence = VAE.kl_divergence(logvar, mu) 
                 elbo_loss = VAE.elbo_loss(reconstruction_loss, kl_divergence, beta)
                 
                 # Back Propagation
@@ -194,9 +194,9 @@ def main():
                 optimizer.step()
 
                 # Track Losses 
-                epoch_reconstruction_loss += reconstruction_loss.item() * batch.size(0)
-                epoch_kl_divergence += kl_divergence.item() * batch.size(0)
-                epoch_elbo_loss += elbo_loss.item() * batch.size(0)
+                epoch_reconstruction_loss += reconstruction_loss.item() 
+                epoch_kl_divergence += kl_divergence.item() 
+                epoch_elbo_loss += elbo_loss.item() 
 
             avg_reconstruction_loss = epoch_reconstruction_loss / len(train_data.dataset)
             training_reconstruction_loss.append(avg_reconstruction_loss)
@@ -206,9 +206,8 @@ def main():
             
             avg_training_elbo_loss = epoch_elbo_loss / len(train_data.dataset)
             training_elbo_loss.append(avg_training_elbo_loss)
-            logging.info(f"Training Loss: {avg_training_elbo_loss}")
 
-            scheduler.step()
+            logging.info(f"Training Reconstruction Loss: {avg_reconstruction_loss}, KL Divergence: {avg_kl_divergence}, ELBO Loss: {avg_training_elbo_loss}")
 
             model.eval()
 
@@ -222,32 +221,35 @@ def main():
                     batch = batch.to(device)
                     reconstructed, mu, logvar = model(batch)
 
-                    # Calculate losses
+                    # Loss Calculation
                     reconstruction_loss = VAE.reconstruction_loss(reconstructed, batch)
-                    epoch_reconstruction_loss += reconstruction_loss.item() 
-
-                    kl_divergence = VAE.kl_divergence(logvar, mu)
-                    epoch_kl_divergence += kl_divergence.item() 
-                    
+                    kl_divergence = VAE.kl_divergence(logvar, mu) 
                     elbo_loss = VAE.elbo_loss(reconstruction_loss, kl_divergence, beta)
-                    epoch_elbo_loss += elbo_loss.item() 
+
+                    # Track Losses 
+                    epoch_reconstruction_loss += reconstruction_loss.item()
+                    epoch_kl_divergence += kl_divergence.item()
+                    epoch_elbo_loss += elbo_loss.item()
 
                     # Store mu and logvar as np arrays
                     validation_mu.append(mu.cpu().numpy())
                     validation_logvar.append(logvar.cpu().numpy())
 
-            avg_reconstruction_loss = epoch_reconstruction_loss / len(validation_data)
+            avg_reconstruction_loss = epoch_reconstruction_loss / len(validation_data.dataset)
             validation_reconstruction_loss.append(avg_reconstruction_loss)
 
-            avg_kl_divergence = epoch_kl_divergence / len(validation_data)
+            avg_kl_divergence = epoch_kl_divergence / len(validation_data.dataset)
             validation_kl_divergence.append(avg_kl_divergence)
             
-            avg_validation_elbo_loss = epoch_elbo_loss / len(validation_data)
+            avg_validation_elbo_loss = epoch_elbo_loss / len(validation_data.dataset)
             validation_elbo_loss.append(avg_validation_elbo_loss)
-            logging.info(f"Validation Loss: {avg_validation_elbo_loss}")
+
+            logging.info(f"Validation Reconstruction Loss: {avg_reconstruction_loss}, KL Divergence: {avg_kl_divergence}, ELBO Loss: {avg_validation_elbo_loss}")
 
             elapsed_time = ut.ElapsedSecondsSince(epoch_start_time)
             epoch_time.append(elapsed_time)
+
+            scheduler.step()
 
             logging.info(f"Elapsed time: {ut.FormatSeconds(elapsed_time)}")
 
@@ -361,12 +363,12 @@ def main():
 
                 # Calculate Losses
                 reconstruction_loss = VAE.reconstruction_loss(reconstructed, batch)
-                kl_divergence = VAE.kl_divergence(logvar, mu) / batch.size(0)
+                kl_divergence = VAE.kl_divergence(logvar, mu) 
                 elbo_loss = VAE.elbo_loss(reconstruction_loss, kl_divergence, beta)
-                test_loss += elbo_loss.item()  * batch.size(0)
+                test_loss += elbo_loss.item() 
 
         avg_test_loss = test_loss / len(test_data.dataset)
-        logging.info(f"Test Loss: {avg_test_loss}\n")
+        logging.info(f"Test Reconstruction Loss: {reconstruction_loss}, KL Divergence: {kl_divergence}, ELBO Loss: {avg_test_loss}\n")
 
         # * * * * * * * * * * * * * * * *
         # SAVE METRICS

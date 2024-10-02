@@ -238,20 +238,10 @@ class VAE(nn.Module):
 
     @staticmethod
     def kl_divergence(logvar, mu):
-        return -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+        return -0.5 * torch.mean(1 + logvar - mu.pow(2) - logvar.exp())
 
     @staticmethod
     def elbo_loss(reconstruction_loss, kl_divergence, beta):
-        '''
-        @brief The reconstruction loss calculated using
-            the "Evidence Lower Bound" (ELBO) technique
-        @param reconstruction_loss TBD
-        @param kl_divergence TBD
-        @param beta Weight for the KL Divergence (higher beta == enforces
-            learning a latent space with a normal distribution at the cost of
-            reconstruction quality, lower beta == enforces higher quality 
-            reconstruction at the cost of a latent space's normal distribution)
-        '''
         return reconstruction_loss + beta * kl_divergence
 
     @staticmethod
