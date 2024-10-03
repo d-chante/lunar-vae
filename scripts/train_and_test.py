@@ -198,13 +198,13 @@ def main():
                 epoch_kl_divergence += kl_divergence.item() 
                 epoch_elbo_loss += elbo_loss.item() 
 
-            avg_reconstruction_loss = epoch_reconstruction_loss / len(train_data.dataset)
+            avg_reconstruction_loss = epoch_reconstruction_loss / len(train_data)
             training_reconstruction_loss.append(avg_reconstruction_loss)
 
-            avg_kl_divergence = epoch_kl_divergence / len(train_data.dataset)
+            avg_kl_divergence = epoch_kl_divergence / len(train_data)
             training_kl_divergence.append(avg_kl_divergence)
             
-            avg_training_elbo_loss = epoch_elbo_loss / len(train_data.dataset)
+            avg_training_elbo_loss = epoch_elbo_loss / len(train_data)
             training_elbo_loss.append(avg_training_elbo_loss)
 
             logging.info(f"Training Reconstruction Loss: {avg_reconstruction_loss}, KL Divergence: {avg_kl_divergence}, ELBO Loss: {avg_training_elbo_loss}")
@@ -235,13 +235,13 @@ def main():
                     validation_mu.append(mu.cpu().numpy())
                     validation_logvar.append(logvar.cpu().numpy())
 
-            avg_reconstruction_loss = epoch_reconstruction_loss / len(validation_data.dataset)
+            avg_reconstruction_loss = epoch_reconstruction_loss / len(validation_data)
             validation_reconstruction_loss.append(avg_reconstruction_loss)
 
-            avg_kl_divergence = epoch_kl_divergence / len(validation_data.dataset)
+            avg_kl_divergence = epoch_kl_divergence / len(validation_data)
             validation_kl_divergence.append(avg_kl_divergence)
             
-            avg_validation_elbo_loss = epoch_elbo_loss / len(validation_data.dataset)
+            avg_validation_elbo_loss = epoch_elbo_loss / len(validation_data)
             validation_elbo_loss.append(avg_validation_elbo_loss)
 
             logging.info(f"Validation Reconstruction Loss: {avg_reconstruction_loss}, KL Divergence: {avg_kl_divergence}, ELBO Loss: {avg_validation_elbo_loss}")
@@ -352,7 +352,9 @@ def main():
         # TEST
         # * * * * * * * * * * * * * * * *
         logging.info("Testing start")
-        test_loss = 0
+        test_reconstruction_loss = 0
+        test_kl_divergence = 0
+        test_elbo_loss = 0
 
         model.eval()
         with torch.no_grad():
@@ -365,10 +367,17 @@ def main():
                 reconstruction_loss = VAE.reconstruction_loss(reconstructed, batch)
                 kl_divergence = VAE.kl_divergence(logvar, mu) 
                 elbo_loss = VAE.elbo_loss(reconstruction_loss, kl_divergence, beta)
-                test_loss += elbo_loss.item() 
+                
+                # Track losses
+                test_reconstruction_loss += reconstruction_loss.item()
+                test_kl_divergence += kl_divergence.item()
+                test_elbo_loss += elbo_loss.item()
 
-        avg_test_loss = test_loss / len(test_data.dataset)
-        logging.info(f"Test Reconstruction Loss: {reconstruction_loss}, KL Divergence: {kl_divergence}, ELBO Loss: {avg_test_loss}\n")
+        avg_test_reconstruction_loss = test_reconstruction_loss / len(test_data)
+        avg_test_kl_divergence = test_kl_divergence / len(test_data)
+        avg_test_elbo_loss = test_elbo_loss / len(test_data)
+
+        logging.info(f"Test Reconstruction Loss: {avg_test_reconstruction_loss}, KL Divergence: {avg_test_kl_divergence}, ELBO Loss: {avg_test_elbo_loss}\n")
 
         # * * * * * * * * * * * * * * * *
         # SAVE METRICS
@@ -392,7 +401,7 @@ def main():
             total_training_time,
             avg_training_elbo_loss,
             avg_validation_elbo_loss,
-            avg_test_loss,
+            avg_test_elbo_loss,
             results_filepath
         )
         logging.info(f"Saved other metrics to {results_filepath}")

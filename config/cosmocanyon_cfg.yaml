@@ -9,6 +9,6 @@ training_parameters:
   gamma: 0.99
   beta: 0.2
   dropout: 0
-  epochs: 100
+  epochs: 200
   batch_size: 200
   gpu: 0
