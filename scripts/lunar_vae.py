@@ -236,7 +236,7 @@ class VAE(nn.Module):
 
     @staticmethod
     def reconstruction_loss(recon_x, x):
-        return nn.functional.l1_loss(recon_x, x, reduction='mean')
+        return nn.functional.mse_loss(recon_x, x, reduction='mean')
 
     @staticmethod
     def kl_divergence(logvar, mu):
