@@ -386,7 +386,7 @@ def main():
 
         model.eval()
         with torch.no_grad():
-            for batch in test_data:
+            for batch_num, batch in enumerate(test_data, 1):
                 # Predict
                 batch = batch.to(device)
                 reconstructed, mu, logvar = model(batch)
@@ -403,13 +403,16 @@ def main():
                 test_kl_divergence += kl_divergence.item()
                 test_elbo_loss += elbo_loss.item()
 
+                logging.info(
+                    f"Batch {batch_num} Test Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
+
         avg_test_reconstruction_loss = test_reconstruction_loss / \
             len(test_data)
         avg_test_kl_divergence = test_kl_divergence / len(test_data)
         avg_test_elbo_loss = test_elbo_loss / len(test_data)
 
         logging.info(
-            f"Test Reconstruction Loss: {avg_test_reconstruction_loss}, KL Divergence: {avg_test_kl_divergence}, ELBO Loss: {avg_test_elbo_loss}\n")
+            f"Test Losses\n\tReconstruction Loss: {avg_test_reconstruction_loss}\n\tKL Divergence: {avg_test_kl_divergence}\n\tELBO Loss: {avg_test_elbo_loss}\n")
 
         # * * * * * * * * * * * * * * * *
         # SAVE METRICS
