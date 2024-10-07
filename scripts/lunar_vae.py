@@ -241,7 +241,7 @@ class VAE(nn.Module):
     @staticmethod
     def kl_divergence(logvar, mu):
         return -0.5 * torch.sum(1 + logvar - mu.pow(2) -
-                                logvar.exp()) / mu.size(0)
+                                logvar.exp()) / (mu.size(0) * mu.size(1))
 
     @staticmethod
     def elbo_loss(reconstruction_loss, kl_divergence, beta):
