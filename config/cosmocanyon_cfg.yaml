@@ -6,9 +6,9 @@ directories:
 training_parameters:
   latent_variables: 4
   learning_rate: 1e-3
-  gamma: 0.9
+  gamma: 0.999
   beta: 0.2
   dropout: 0
-  epochs: 100
+  epochs: 1000
   batch_size: 200
   gpu: 0
