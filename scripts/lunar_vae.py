@@ -10,11 +10,12 @@ class Wrap1d(nn.Module):
         self.wrap_size = wrap_size
 
     def forward(self, x):
-        wrapped_part_start = x[:, :, -self.wrap_size:]  
-        wrapped_part_end = x[:, :, :self.wrap_size]  
-        x_wrapped = torch.cat([wrapped_part_start, x, wrapped_part_end], dim=2) 
+        wrapped_part_start = x[:, :, -self.wrap_size:]
+        wrapped_part_end = x[:, :, :self.wrap_size]
+        x_wrapped = torch.cat([wrapped_part_start, x, wrapped_part_end], dim=2)
         return x_wrapped
-    
+
+
 class Crop1d(nn.Module):
     def __init__(self, crop_size):
         super(Crop1d, self).__init__()
@@ -24,6 +25,7 @@ class Crop1d(nn.Module):
         start = self.crop_size
         end = -self.crop_size if self.crop_size != 0 else None
         return x[:, :, start:end]
+
 
 class VAE(nn.Module):
 
@@ -238,8 +240,9 @@ class VAE(nn.Module):
 
     @staticmethod
     def kl_divergence(logvar, mu):
-        return -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()) / mu.size(0)
-    
+        return -0.5 * torch.sum(1 + logvar - mu.pow(2) -
+                                logvar.exp()) / mu.size(0)
+
     @staticmethod
     def elbo_loss(reconstruction_loss, kl_divergence, beta):
         return reconstruction_loss + beta * kl_divergence
@@ -266,7 +269,7 @@ class VAE(nn.Module):
         }
         torch.save(checkpoint, filepath)
         return f"Saved state to {filepath}"
-    
+
     @staticmethod
     def load_state(state_path, latent_variables=4, dropout=0, device='cpu'):
         '''

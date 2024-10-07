@@ -43,7 +43,7 @@ class Utils(object):
             p = self.Json2Profile(os.path.join(data_dir, profile))
             if p is not None:
                 profiles.append(p)
-        
+
         if tensor:
             data = np.stack(profiles, axis=0)
             np.random.shuffle(data)
@@ -55,7 +55,7 @@ class Utils(object):
 
             train_data, validation_data = train_test_split(
                 remainder_data, test_size=0.1, random_state=42)
-            
+
             mean = np.mean(train_data)
             std = np.std(train_data)
 
@@ -64,7 +64,8 @@ class Utils(object):
             train_loader = DataLoader(train_tensor, batch_size, shuffle=True)
 
             validation_data = self.Normalize(validation_data, mean, std)
-            validation_tensor = torch.tensor(validation_data, dtype=torch.float32)
+            validation_tensor = torch.tensor(
+                validation_data, dtype=torch.float32)
             validation_loader = DataLoader(
                 validation_tensor, batch_size, shuffle=False)
 
@@ -78,7 +79,7 @@ class Utils(object):
             ret = profiles
 
         return ret
-    
+
     @staticmethod
     def Normalize(data, mean, std):
         '''
@@ -165,15 +166,21 @@ class Utils(object):
 
     @staticmethod
     def SaveLoss2Csv(
-            training_reconstruction_loss, training_kl_divergence, training_elbo_loss, 
-            validation_reconstruction_loss, validation_kl_divergence, validation_elbo_loss, 
+            training_reconstruction_loss,
+            training_kl_divergence,
+            training_elbo_loss,
+            validation_reconstruction_loss,
+            validation_kl_divergence,
+            validation_elbo_loss,
             filepath):
-        df = pd.DataFrame({'training_reconstruction_loss': training_reconstruction_loss,
-                           'training_kl_divergence': training_kl_divergence,
-                           'training_elbo_loss': training_elbo_loss,
-                           'validation_reconstruction_loss': validation_reconstruction_loss,
-                           'validation_kl_divergence': validation_kl_divergence,
-                           'validation_elbo_loss': validation_elbo_loss})
+        df = pd.DataFrame(
+            {
+                'training_reconstruction_loss': training_reconstruction_loss,
+                'training_kl_divergence': training_kl_divergence,
+                'training_elbo_loss': training_elbo_loss,
+                'validation_reconstruction_loss': validation_reconstruction_loss,
+                'validation_kl_divergence': validation_kl_divergence,
+                'validation_elbo_loss': validation_elbo_loss})
         df.to_csv(filepath, index=True)
 
     @staticmethod
@@ -238,6 +245,10 @@ class Utils(object):
             'validation_loss_kelvins': [validation_loss * data_std],
             'test_loss_kelvins': [test_loss * data_std]
         })
-        
+
         file_exists = os.path.isfile(filepath)
-        df.to_csv(filepath, mode='a' if file_exists else 'w', index=False, header=not file_exists)
+        df.to_csv(
+            filepath,
+            mode='a' if file_exists else 'w',
+            index=False,
+            header=not file_exists)

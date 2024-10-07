@@ -82,7 +82,7 @@ def main():
         # LOGGER
         # * * * * * * * * * * * * * * * *
         logging.basicConfig(
-            level=logging.DEBUG,  
+            level=logging.DEBUG,
             format='%(asctime)s - %(levelname)s - %(message)s',
             handlers=[
                 logging.FileHandler(
@@ -137,9 +137,12 @@ def main():
         logging.info(f"Data Mean: {metrics[0]}")
         logging.info(f"Data Standard Deviation: {metrics[1]}\n")
 
-        logging.info(f"Training data: {len(train_data.dataset)}")
-        logging.info(f"Validation data: {len(validation_data.dataset)}")
-        logging.info(f"Test data: {len(test_data.dataset)}\n")
+        logging.info(
+            f"Training data: {len(train_data.dataset)} profiles in {len(train_data)} batches")
+        logging.info(
+            f"Validation data: {len(validation_data.dataset)} profiles in {len(validation_data)} batches")
+        logging.info(
+            f"Test data: {len(test_data.dataset)} profiles in {len(test_data)} batches\n")
 
         # * * * * * * * * * * * * * * * *
         # TRAIN/VALIDATE
@@ -164,87 +167,103 @@ def main():
             file_label +
             "_model_state.pt")
 
-        logging.info("Training start\n")
-
         best_val_loss = float('inf')
 
         for epoch in range(num_epochs):
-            logging.info(f"Epoch {epoch+1} of {num_epochs}")
+            logging.info(
+                f"------------------Epoch {epoch+1} of {num_epochs}------------------")
             epoch_start_time = datetime.datetime.now()
 
             model.train()
+            logging.info("Training...")
 
             epoch_reconstruction_loss = 0
             epoch_kl_divergence = 0
             epoch_elbo_loss = 0
-            
-            for batch in train_data:
+
+            for batch_num, batch in enumerate(train_data, 1):
                 # Predict
                 batch = batch.to(device)
-                optimizer.zero_grad()
                 reconstructed, mu, logvar = model(batch)
 
                 # Loss Calculation
-                reconstruction_loss = VAE.reconstruction_loss(reconstructed, batch)
-                kl_divergence = VAE.kl_divergence(logvar, mu) 
-                elbo_loss = VAE.elbo_loss(reconstruction_loss, kl_divergence, beta)
-                
+                reconstruction_loss = VAE.reconstruction_loss(
+                    reconstructed, batch)
+                kl_divergence = VAE.kl_divergence(logvar, mu)
+                elbo_loss = VAE.elbo_loss(
+                    reconstruction_loss, kl_divergence, beta)
+
                 # Back Propagation
+                optimizer.zero_grad()
                 elbo_loss.backward()
                 optimizer.step()
 
-                # Track Losses 
-                epoch_reconstruction_loss += reconstruction_loss.item() 
-                epoch_kl_divergence += kl_divergence.item() 
-                epoch_elbo_loss += elbo_loss.item() 
+                # Track Losses over batches
+                epoch_reconstruction_loss += reconstruction_loss.item()
+                epoch_kl_divergence += kl_divergence.item()
+                epoch_elbo_loss += elbo_loss.item()
 
-            avg_reconstruction_loss = epoch_reconstruction_loss / len(train_data)
+                logging.info(
+                    f"Batch {batch_num} Training Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
+
+            # Get average of loss per batch
+            avg_reconstruction_loss = epoch_reconstruction_loss / \
+                len(train_data)
             training_reconstruction_loss.append(avg_reconstruction_loss)
 
             avg_kl_divergence = epoch_kl_divergence / len(train_data)
             training_kl_divergence.append(avg_kl_divergence)
-            
+
             avg_training_elbo_loss = epoch_elbo_loss / len(train_data)
             training_elbo_loss.append(avg_training_elbo_loss)
 
-            logging.info(f"Training Reconstruction Loss: {avg_reconstruction_loss}, KL Divergence: {avg_kl_divergence}, ELBO Loss: {avg_training_elbo_loss}")
+            logging.info(
+                f"Epoch {epoch+1} Training Losses\n\tReconstruction Loss: {avg_reconstruction_loss}\n\tKL Divergence: {avg_kl_divergence}\n\tELBO Loss: {avg_training_elbo_loss}\n")
 
             model.eval()
+            logging.info("Validate...")
 
             epoch_reconstruction_loss = 0
             epoch_kl_divergence = 0
             epoch_elbo_loss = 0
 
             with torch.no_grad():
-                for batch in validation_data:
+                for batch_num, batch in enumerate(validation_data, 1):
                     # Predict
                     batch = batch.to(device)
                     reconstructed, mu, logvar = model(batch)
 
                     # Loss Calculation
-                    reconstruction_loss = VAE.reconstruction_loss(reconstructed, batch)
-                    kl_divergence = VAE.kl_divergence(logvar, mu) 
-                    elbo_loss = VAE.elbo_loss(reconstruction_loss, kl_divergence, beta)
+                    reconstruction_loss = VAE.reconstruction_loss(
+                        reconstructed, batch)
+                    kl_divergence = VAE.kl_divergence(logvar, mu)
+                    elbo_loss = VAE.elbo_loss(
+                        reconstruction_loss, kl_divergence, beta)
 
-                    # Track Losses 
+                    # Track Losses over batches
                     epoch_reconstruction_loss += reconstruction_loss.item()
                     epoch_kl_divergence += kl_divergence.item()
                     epoch_elbo_loss += elbo_loss.item()
+
+                    logging.info(
+                        f"Batch {batch_num} Validation Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
 
                     # Store mu and logvar as np arrays
                     validation_mu.append(mu.cpu().numpy())
                     validation_logvar.append(logvar.cpu().numpy())
 
-            avg_reconstruction_loss = epoch_reconstruction_loss / len(validation_data)
+            avg_reconstruction_loss = epoch_reconstruction_loss / \
+                len(validation_data)
             validation_reconstruction_loss.append(avg_reconstruction_loss)
 
             avg_kl_divergence = epoch_kl_divergence / len(validation_data)
             validation_kl_divergence.append(avg_kl_divergence)
-            
+
             avg_validation_elbo_loss = epoch_elbo_loss / len(validation_data)
             validation_elbo_loss.append(avg_validation_elbo_loss)
 
-            logging.info(f"Validation Reconstruction Loss: {avg_reconstruction_loss}, KL Divergence: {avg_kl_divergence}, ELBO Loss: {avg_validation_elbo_loss}")
+            logging.info(
+                f"Epoch {epoch+1} Validation Losses\n\tReconstruction Loss: {avg_reconstruction_loss}\n\tKL Divergence: {avg_kl_divergence}\n\tELBO Loss: {avg_validation_elbo_loss}\n")
 
             elapsed_time = ut.ElapsedSecondsSince(epoch_start_time)
             epoch_time.append(elapsed_time)
@@ -256,8 +275,10 @@ def main():
             if avg_validation_elbo_loss < best_val_loss:
                 best_val_loss = avg_validation_elbo_loss
                 logging.info(
+                    f"Saving model with best validation ELBO loss {best_val_loss}")
+                logging.info(
                     model.save_state(
-                        epoch+1,
+                        epoch + 1,
                         model,
                         optimizer,
                         scheduler,
@@ -271,6 +292,7 @@ def main():
         total_training_time = ut.FormatSeconds(
             ut.ElapsedSecondsSince(training_start_time))
 
+        logging.info(f"Best validation ELBO Loss: {best_val_loss}")
         logging.info(f"Average epoch time: {avg_epoch_time}")
         logging.info(f"Total training time: {total_training_time}\n")
 
@@ -287,8 +309,8 @@ def main():
             training_kl_divergence,
             training_elbo_loss,
             validation_reconstruction_loss,
-            validation_kl_divergence, 
-            validation_elbo_loss, 
+            validation_kl_divergence,
+            validation_elbo_loss,
             tvl_path)
         logging.info(f"Saved training and validation loss to {tvl_path}")
 
@@ -323,15 +345,21 @@ def main():
         axes[0].set_ylabel('ELBO Loss')
         axes[0].legend()
 
-        axes[1].plot(training_reconstruction_loss, label='Training Reconstruction Loss')
-        axes[1].plot(validation_reconstruction_loss, label='Validation Reconstruction Loss')
+        axes[1].plot(
+            training_reconstruction_loss,
+            label='Training Reconstruction Loss')
+        axes[1].plot(
+            validation_reconstruction_loss,
+            label='Validation Reconstruction Loss')
         axes[1].set_title('Training/Validation Reconstruction Loss per Epoch')
         axes[1].set_xlabel('Epochs')
         axes[1].set_ylabel('Reconstruction Loss')
         axes[1].legend()
 
         axes[2].plot(training_kl_divergence, label='Training KL Divergence')
-        axes[2].plot(validation_kl_divergence, label='Validation KL Divergence')
+        axes[2].plot(
+            validation_kl_divergence,
+            label='Validation KL Divergence')
         axes[2].set_title('Training/Validation KL Divergence per Epoch')
         axes[2].set_xlabel('Epochs')
         axes[2].set_ylabel('KL Divergence')
@@ -359,25 +387,29 @@ def main():
         model.eval()
         with torch.no_grad():
             for batch in test_data:
-                #Predict 
+                # Predict
                 batch = batch.to(device)
                 reconstructed, mu, logvar = model(batch)
 
                 # Calculate Losses
-                reconstruction_loss = VAE.reconstruction_loss(reconstructed, batch)
-                kl_divergence = VAE.kl_divergence(logvar, mu) 
-                elbo_loss = VAE.elbo_loss(reconstruction_loss, kl_divergence, beta)
-                
+                reconstruction_loss = VAE.reconstruction_loss(
+                    reconstructed, batch)
+                kl_divergence = VAE.kl_divergence(logvar, mu)
+                elbo_loss = VAE.elbo_loss(
+                    reconstruction_loss, kl_divergence, beta)
+
                 # Track losses
                 test_reconstruction_loss += reconstruction_loss.item()
                 test_kl_divergence += kl_divergence.item()
                 test_elbo_loss += elbo_loss.item()
 
-        avg_test_reconstruction_loss = test_reconstruction_loss / len(test_data)
+        avg_test_reconstruction_loss = test_reconstruction_loss / \
+            len(test_data)
         avg_test_kl_divergence = test_kl_divergence / len(test_data)
         avg_test_elbo_loss = test_elbo_loss / len(test_data)
 
-        logging.info(f"Test Reconstruction Loss: {avg_test_reconstruction_loss}, KL Divergence: {avg_test_kl_divergence}, ELBO Loss: {avg_test_elbo_loss}\n")
+        logging.info(
+            f"Test Reconstruction Loss: {avg_test_reconstruction_loss}, KL Divergence: {avg_test_kl_divergence}, ELBO Loss: {avg_test_elbo_loss}\n")
 
         # * * * * * * * * * * * * * * * *
         # SAVE METRICS
@@ -405,6 +437,7 @@ def main():
             results_filepath
         )
         logging.info(f"Saved other metrics to {results_filepath}")
+
 
 if __name__ == "__main__":
     main()
