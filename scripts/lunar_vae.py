@@ -233,6 +233,10 @@ class VAE(nn.Module):
         mu, logvar = self.encode(x)
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
+    
+    @staticmethod
+    def beta(curr_epoch, num_epochs, max_beta=1.0):
+        return min(max_beta, max_beta * (curr_epoch/num_epochs))
 
     @staticmethod
     def reconstruction_loss(recon_x, x):
