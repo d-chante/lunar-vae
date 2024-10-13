@@ -70,7 +70,6 @@ def main():
         latent_variables = config['latent_variables']
         learning_rate = float(config['learning_rate'])
         gamma = float(config['gamma'])
-        beta = config['beta']
         dropout = config['dropout']
         num_epochs = config['epochs']
         batch_size = config['batch_size']
@@ -107,7 +106,7 @@ def main():
         logging.info(f"Latent Variables: {latent_variables}")
         logging.info(f"Learning Rate: {learning_rate}")
         logging.info(f"Gamma: {gamma}")
-        logging.info(f"Beta: {beta}")
+        logging.info(f"Beta: Annealing (max: 1.0)")
         logging.info(f"Dropout: {dropout}")
         logging.info(f"Number of Epochs: {num_epochs}")
         logging.info(f"Batch Size: {batch_size}")
@@ -179,6 +178,7 @@ def main():
             logging.info(
                 f"------------------Epoch {epoch+1} of {num_epochs}------------------")
             epoch_start_time = datetime.datetime.now()
+            beta = VAE.beta(epoch, num_epochs)
 
             model.train()
             logging.info("Training...")
