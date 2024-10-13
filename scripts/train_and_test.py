@@ -39,6 +39,12 @@ def main():
         '--show',
         action='store_true',
         help='Show model summary and training/validation plot')
+    parser.add_argument(
+        '-i',
+        '--info',
+        action='store_true',
+        help='Show batch info (note: results in large log files)'
+    )
 
     try:
         args = parser.parse_args()
@@ -203,8 +209,9 @@ def main():
                 epoch_kl_divergence += kl_divergence.item()
                 epoch_elbo_loss += elbo_loss.item()
 
-                logging.info(
-                    f"Batch {batch_num} Training Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
+                if args.info:
+                    logging.info(
+                        f"Batch {batch_num} Training Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
 
             # Get average of loss per batch
             avg_reconstruction_loss = epoch_reconstruction_loss / \
@@ -245,8 +252,9 @@ def main():
                     epoch_kl_divergence += kl_divergence.item()
                     epoch_elbo_loss += elbo_loss.item()
 
-                    logging.info(
-                        f"Batch {batch_num} Validation Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
+                    if args.info:
+                        logging.info(
+                            f"Batch {batch_num} Validation Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
 
                     # Store mu and logvar as np arrays
                     validation_mu.append(mu.cpu().numpy())
@@ -403,8 +411,9 @@ def main():
                 test_kl_divergence += kl_divergence.item()
                 test_elbo_loss += elbo_loss.item()
 
-                logging.info(
-                    f"Batch {batch_num} Test Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
+                if args.info:
+                    logging.info(
+                        f"Batch {batch_num} Test Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
 
         avg_test_reconstruction_loss = test_reconstruction_loss / \
             len(test_data)
