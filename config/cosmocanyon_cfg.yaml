@@ -1,5 +1,5 @@
 directories:
-  profiles_directory: "/esthar/diviner_data/data/profiles"
+  profiles_directory: "/esthar/diviner_data/data/abr_profiles"
   output_directory: "/esthar/diviner_data/data/output"
   results_filepath: "/esthar/diviner_data/data/output/results.csv"
 
@@ -9,6 +9,6 @@ training_parameters:
   gamma: 0.995
   beta: 0.2
   dropout: 0
-  epochs: 1000
+  epochs: 100
   batch_size: 200
   gpu: 0
