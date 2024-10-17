@@ -106,7 +106,7 @@ def main():
         logging.info(f"Latent Variables: {latent_variables}")
         logging.info(f"Learning Rate: {learning_rate}")
         logging.info(f"Gamma: {gamma}")
-        logging.info(f"Beta: KL Annealing (max beta: 1.0)")
+        logging.info(f"Beta: 0.2")
         logging.info(f"Dropout: {dropout}")
         logging.info(f"Number of Epochs: {num_epochs}")
         logging.info(f"Batch Size: {batch_size}")
@@ -178,7 +178,7 @@ def main():
             logging.info(
                 f"------------------Epoch {epoch+1} of {num_epochs}------------------")
             epoch_start_time = datetime.datetime.now()
-            beta = VAE.beta(epoch, num_epochs)
+            beta = 0.2
 
             model.train()
             logging.info("Training...")
@@ -205,9 +205,9 @@ def main():
                 optimizer.step()
 
                 # Track Losses over batches
-                epoch_reconstruction_loss += reconstruction_loss.item()
-                epoch_kl_divergence += kl_divergence.item()
-                epoch_elbo_loss += elbo_loss.item()
+                epoch_reconstruction_loss += reconstruction_loss.item() * batch.size(0)
+                epoch_kl_divergence += kl_divergence.item() * batch.size(0)
+                epoch_elbo_loss += elbo_loss.item() * batch.size(0)
 
                 if args.info:
                     logging.info(
@@ -248,9 +248,9 @@ def main():
                         reconstruction_loss, kl_divergence, beta)
 
                     # Track Losses over batches
-                    epoch_reconstruction_loss += reconstruction_loss.item()
-                    epoch_kl_divergence += kl_divergence.item()
-                    epoch_elbo_loss += elbo_loss.item()
+                    epoch_reconstruction_loss += reconstruction_loss.item() * batch.size(0)
+                    epoch_kl_divergence += kl_divergence.item() * batch.size(0)
+                    epoch_elbo_loss += elbo_loss.item() * batch.size(0)
 
                     if args.info:
                         logging.info(
@@ -407,9 +407,9 @@ def main():
                     reconstruction_loss, kl_divergence, beta)
 
                 # Track losses
-                test_reconstruction_loss += reconstruction_loss.item()
-                test_kl_divergence += kl_divergence.item()
-                test_elbo_loss += elbo_loss.item()
+                test_reconstruction_loss += reconstruction_loss.item() * batch.size(0)
+                test_kl_divergence += kl_divergence.item() * batch.size(0)
+                test_elbo_loss += elbo_loss.item() * batch.size(0)
 
                 if args.info:
                     logging.info(
