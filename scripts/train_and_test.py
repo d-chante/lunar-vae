@@ -215,13 +215,13 @@ def main():
 
             # Get average of loss per batch
             avg_reconstruction_loss = epoch_reconstruction_loss / \
-                len(train_data)
+                len(train_data.dataset)
             training_reconstruction_loss.append(avg_reconstruction_loss)
 
-            avg_kl_divergence = epoch_kl_divergence / len(train_data)
+            avg_kl_divergence = epoch_kl_divergence / len(train_data.dataset)
             training_kl_divergence.append(avg_kl_divergence)
 
-            avg_training_elbo_loss = epoch_elbo_loss / len(train_data)
+            avg_training_elbo_loss = epoch_elbo_loss / len(train_data.dataset)
             training_elbo_loss.append(avg_training_elbo_loss)
 
             logging.info(
@@ -261,13 +261,13 @@ def main():
                     validation_logvar.append(logvar.cpu().numpy())
 
             avg_reconstruction_loss = epoch_reconstruction_loss / \
-                len(validation_data)
+                len(validation_data.dataset)
             validation_reconstruction_loss.append(avg_reconstruction_loss)
 
-            avg_kl_divergence = epoch_kl_divergence / len(validation_data)
+            avg_kl_divergence = epoch_kl_divergence / len(validation_data.dataset)
             validation_kl_divergence.append(avg_kl_divergence)
 
-            avg_validation_elbo_loss = epoch_elbo_loss / len(validation_data)
+            avg_validation_elbo_loss = epoch_elbo_loss / len(validation_data.dataset)
             validation_elbo_loss.append(avg_validation_elbo_loss)
 
             logging.info(
@@ -416,9 +416,9 @@ def main():
                         f"Batch {batch_num} Test Losses\n\tReconstruction Loss: {reconstruction_loss.item()}\n\tKL Divergence: {kl_divergence.item()}\n\tELBO Loss: {elbo_loss.item()}\n")
 
         avg_test_reconstruction_loss = test_reconstruction_loss / \
-            len(test_data)
-        avg_test_kl_divergence = test_kl_divergence / len(test_data)
-        avg_test_elbo_loss = test_elbo_loss / len(test_data)
+            len(test_data.dataset)
+        avg_test_kl_divergence = test_kl_divergence / len(test_data.dataset)
+        avg_test_elbo_loss = test_elbo_loss / len(test_data.dataset)
 
         logging.info(
             f"Test Losses\n\tReconstruction Loss: {avg_test_reconstruction_loss}\n\tKL Divergence: {avg_test_kl_divergence}\n\tELBO Loss: {avg_test_elbo_loss}\n")
