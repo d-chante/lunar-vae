@@ -239,13 +239,12 @@ class VAE(nn.Module):
         return min(max_beta, max_beta * (curr_epoch/num_epochs))
 
     @staticmethod
-    def reconstruction_loss(recon_x, x):
-        return nn.functional.mse_loss(recon_x, x, reduction='mean')
+    def reconstruction_loss(recon_x, x, sigma=1.0):
+        return nn.functional.mse_loss(recon_x, x, reduction='sum') / (2 * sigma**2)
 
     @staticmethod
     def kl_divergence(logvar, mu):
-        return -0.5 * torch.sum(1 + logvar - mu.pow(2) -
-                                logvar.exp()) / (mu.size(0) * mu.size(1))
+        return -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
     @staticmethod
     def elbo_loss(reconstruction_loss, kl_divergence, beta):
