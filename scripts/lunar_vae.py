@@ -469,7 +469,7 @@ def VisualizeLatentSpace(
             with torch.no_grad():
                 # Create a latent vector with one dimension varied
                 z = torch.zeros((1, latent_dim), device=device)
-                z[0, i] = val
+                z[0, i] = float(val)
 
                 prediction = vae.decoder(z.unsqueeze(2))
                 prediction = prediction.squeeze(0).cpu().numpy().reshape(1, -1)
